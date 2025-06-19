@@ -9,15 +9,17 @@
     * 1.4. [ BUSCO ](#busco)
     * 1.5. [ TransDecoder ](#transdec)
     * 1.6. [ EggNOG ](#eggN)
-    * 1.7. [ InterProScan ](#ips)
-    * 1.8. [ UniProt ](#up)   
-    * 1.9. [ Final Output GTF](#fog)
+    * 1.8. [ UniProt ](#up)  
++ 2. Fucntional Annotation Outside the Pipeline
+    * 2.1. [ InterProScan ](#ips) 
++ 3. Custom Python Script for summarized GTF file of transcriptome and its annotations
+    * 3.1. [ Final Output GTF](#fog)
 
    
 ###### ================================================================================
 
 <a name="nf_pipe"></a>
-## 2. Nextflow Pipeline - Implemented Tool Commands 
+## 1. Nextflow Pipeline - Implemented Tool Commands 
 ## Transcriptome Reconstruction & Annotation
 
 As the reconstruction and analyses of biological data can be very individual and to also provide the user with the knwoledge of how every step was used and in what order, all commands implemented into the pipeline are listed in the following part. With this it is also easy to follow and use an individual step if necessary. 
@@ -52,7 +54,7 @@ gffread -w xxx_transcripts.fa -g xxx_genome.fa stringtie2_xxx_transcripts.gtf
 ```
 # 4. BUSCO - Transcriptome Completeness Assessment
 # offline:
-busco -i xxx_transcripts.fa -l /PATH/TO/busco_downloads/lineages/vertebrata_odb10 -o OUTPUT_FILDER/ -m transcriptome --offline -c NO_THREADS
+busco -i xxx_transcripts.fa -l vertebrata_odb10 --download_path PATH/TO/busco_downloads/ -o OUTPUT_FILDER/ -m transcriptome --offline -c NO_THREADS
 # with data download
 busco -i xxx_transcripts.fa -l vertebrata_odb10 -o OUTPUT_FILDER/ -m transcriptome -c NO_THREADS
 ```
@@ -66,8 +68,9 @@ TransDecoder.LongOrfs -t xxx_transcripts.fa
 
 <a name="eggN"></a>
 ### 1.6 eggNOG []
+EggNOG annotation ...
+1. Download the required databases:
 ```
-# 6. EggNOG annotation
 # download databases (~13G & ~9G & ~7G)
 mkdir bin/
 cd bin/
@@ -82,19 +85,51 @@ wget http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.taxa.tar.gz
 tar –xvzf eggnog.taxa.tar.gz
 
 cd ..
-
-# run
+```
+2. run the eggNOG command:
+```
 emapper.py  -m diamond --itype proteins -i xxx_transdecoder.pep -o NAME_PREFIX --data_dir /folder/with/databases
 ```
-<a name="ips"></a>
-### 1.7 InterProScan []
-# 7. InterProScan annotation **(planned)**
 
 <a name="up"></a>
-### 1.8 UniProt []
-# 8. UniProt annotation **(planned)**
+### 1.7 UniProt []
+# 1.7 UniProt annotation **(planned)**
+
+
+<a name="ips"></a>
+## 2. Fucntional Annotation Outside the Pipeline
+# 2.1. InterProScan annotation **(planned)**
+It was decided to not include InterProScan into the Nextflow pipeline generated during this project. It caused memory issues while building the docker container for the pipeline. Additionally InterProScan provides an already available docker container which is easy to use. 
+To install and run InterProScan with their docker container follow the commands listed below or visit the website [https://interproscan-docs.readthedocs.io/en/v5/HowToUseViaContainer.html].
+```
+docker pull interpro/interproscan:5.74-105.0
+# ...
+# Status: Downloaded newer image for interpro/interproscan:5.74-105.0
+# docker.io/interpro/interproscan:5.74-105.0
+
+mkdir input temp output
+
+cp PATH/TO/transcriptome.fa /input
+
+docker run --rm \
+    -u $(id -u):$(id -g) \
+    -v $PWD/interproscan-5.74-105.0/data:/opt/interproscan/data \
+    -v $PWD/input:/input \
+    -v $PWD/temp:/temp \
+    -v $PWD/output:/output \
+    interpro/interproscan:5.74-105.0 \
+    --input /input/stringtie2_AC_PROM_Q10_noAR_both_transcripts.fa \
+    --output-dir /output \ 
+    --tempdir /temp \ 
+    --cpu 8
+19/06/2025 12:51:38:378 Welcome to InterProScan-5.74-105.0 
+
+```
+
+
+
 
 <a name="fog"></a>
-### 1.9 Final Output Generation []
-# 9. Final output generation **(in progress)**
+## 3. Custom Python Script for summarized GTF file of transcriptome and its annotations
+## 3.1. Final output generation **(in progress)**
 
