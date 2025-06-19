@@ -137,6 +137,9 @@ Here I will only explain the usage with the docker container. The installation i
 # 1. docker - build docker container [https://docs.docker.com/engine/install/ubuntu/]
 https://docs.docker.com/engine/install/ubuntu/
 
+cd to/folder/with/Dockerfile
+docker build -t NAME_OF_IMAGE .
+
 # Troubleshooting: I noticed that I could not run the nextflow pipeline as I has a Java version > v21 on my Oprating System. To solve this I created a simple conda environment with Java openjdk=20.0.2. For this I also provide the [conda_java20_env.yml] file from the environment I created. 
 
 # either use the .yml file 
