@@ -87,7 +87,7 @@ It should be noted that for our sequencing runs an exclusion of these reads show
 # this can also be done on fasta file format
 python detect_and_trim_polyA.py raw_reads.fastq
 
-seqkit grep -f read_ids.txt raw_reads.fastq -o raw_reads_noR.fastq
+seqkit grep -v -f read_ids.txt raw_reads.fastq -o raw_reads_noR.fastq
 ```
 
 <a name="nf_pipe"></a>
