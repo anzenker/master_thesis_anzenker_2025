@@ -8,9 +8,6 @@
 + 4. [ FASTQ ](#fastq)
 + 5. [ PEP ](#pep)
 + 6. [ GTF ](#gtf)
-+ 8. [ References](#ref)
-+ 9. [ Some extra commands ](#extra)
-+ 10. [ Abbreviations ](#abbrev)
 ###### ================================================================================
 
 <a name="pod5"></a>
