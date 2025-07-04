@@ -42,7 +42,7 @@ The FASTQ format extends FASTA by including quality scores for each seqeunce. Ea
 ## 5. [PEP](https://pep.databio.org/)
 In short PEP (Portable Excapsuled Projects) is a file format which aims to make metadata reusable. It provides a standardized metadata structure, a metadata validation framework and programmatic metadta modifiers. 
 
-In this projcet the PEP file format is received as one ouptput file from TransDecoder holding all Open Reading Frames (ORFs) meeting a minimum length criteria (default 100 AS), regardless of their coding potential. We use this PEP file as input for the EggNOG anotation.
+In this projcet the PEP file format is received as one ouptput file from [TransDecoder](https://github.com/TransDecoder/TransDecoder/wiki) holding all Open Reading Frames (ORFs) meeting a minimum length criteria (default 100 AS), regardless of their coding potential. We use this PEP file as input for the EggNOG anotation.
 
 The PEP file contains predicted protein sequences (in FASTA format) that TransDecoder has identified from the transcriptome. Each record includes:
 - FASTA header starting with '>', which holds:
