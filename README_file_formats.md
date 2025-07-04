@@ -31,7 +31,7 @@ The SAM (Sequence Alignment/Map format) file is a TAB-delimted text format consi
 The fasta file format is a text based file used to present nucleotide or protein seqeunces. Each seqeuence begins with a header line starting with '>' followed by an optional description, and one or more lines containing the sequence itself. 
 
 <a name="fastq"></a>
-## 4. [FASTQ]((https://rnnh.github.io/bioinfo-notebook/docs/file_formats.html)) 
+## 4. [FASTQ](https://rnnh.github.io/bioinfo-notebook/docs/file_formats.html)
 The FASTQ format extends FASTA by including quality scores for each seqeunce. Each entry consists of four lines: 
 - a header (@), 
 - the sequence, 
