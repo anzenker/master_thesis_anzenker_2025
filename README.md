@@ -1,12 +1,11 @@
-# Master_Thesis_anzenker_2025
+## Repository Information
+
+This project derives from a Master Thesis analysing the Transcriptome from the hybrid whiptail lizard species A. neomexicanus and its parental species A. arizonae and A. marmoratus.
+
+Summarized this repository is a guide for Transcriptome Assembly and Annotation using Nanopore direct RNA sequencing data.
 
 
 
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
 
 ## Add your files
 
