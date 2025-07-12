@@ -84,10 +84,10 @@ Tabular output of alignment view. The default columns are:
 - **6 gapopen** - number of gap openings
 - **7 qstart** - start of alignement in query
 - **8 qend** - end of alignment in query
-- **9 sstart* - start of alignment in subject
+- **9 sstart** - start of alignment in subject
 - **10 send** - end of alignment in subject
 - **11 evalue** - expected value
-- **12 bitscore* - bit score
+- **12 bitscore** - bit score
 
 **Examplary outfmt6 file from blastp output:**
 ![blastp outfmt6 output](images/blastp_outfmt6_output.png)
