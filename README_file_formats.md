@@ -8,6 +8,7 @@
 + 4. [ FASTQ ](#fastq)
 + 5. [ PEP ](#pep)
 + 6. [ GTF ](#gtf)
++ 7. [ outfmt6 ](#blast_out)
 ###### ================================================================================
 
 <a name="pod5"></a>
@@ -60,7 +61,7 @@ The PEP file contains predicted protein sequences (in FASTA format) that TransDe
 The GTF (General Transfer Format) file is TAB-delimited and is identical to GFF (Genral Feature Format) version 2. It consists of one line per feature, each holding 9 mandatory columns plus optional information. Emtpy columns are donoted with '.'.
 Mandatory fields are (descriptions from (https://www.ensembl.org/info/website/upload/gff.html):
 **1 seqname** - name (chromosome/contig ID)
-** 2 source** - name of the program (f.e. stringtie)
+**2 source** - name of the program (f.e. stringtie)
 **3 feature** - feature type name, e.g. gene, transcript, exon, ...
 **4 start** - start position of feature
 **5 end** - end position of feature
@@ -71,3 +72,22 @@ Mandatory fields are (descriptions from (https://www.ensembl.org/info/website/up
 
 **Examplary GTF file from stringtie2 output:**
 ![stringtie2 GTF output](images/stringtie2_output.png)
+
+<a name="blast_out"></a>
+## 6. [BLAST tabular output format (outfmt6) ](https://www.ncbi.nlm.nih.gov/books/NBK279684/table/appendices.T.options_common_to_all_blast/)
+Tabular output of alignment view. The default columns are:
+**1 qseqid** - query seqeunce id (transcript id)
+**2 sseqid** - subject sequence id (gene id)
+**3 pident** - percentage of identical positions
+**4 length** - alignment length
+**5 mismatch** - number of mismatches
+**6 gapopen** - number of gap openings
+**7 qstart** - start of alignement in query
+**8 qend** - end of alignment in query
+**9 sstart* - start of alignment in subject
+**10 send** - end of alignment in subject
+**11 evalue** - expected value
+**12 bitscore* - bit score
+
+**Examplary outfmt6 file from blastp output:**
+![blastp outfmt6 output](images/blastp_outfmt6_output.png)
