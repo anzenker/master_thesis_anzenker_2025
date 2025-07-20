@@ -123,7 +123,7 @@ cp PATH/TO/transcriptome.fa /input
 docker run --rm \
 -u $(id -u):$(id -g) \                                          # run container as my current user, not root
 -v $PWD/interproscan-5.75-106.0/data:/opt/interproscan/data \   # mount local folder into container
--v $PWD/work:/input \                                           # mount ... folder ...
+-v $PWD/input:/input \                                           # mount ... folder ...
 -v $PWD/temp:/temp \                                            # mount ... folder ...
 -v $PWD/output:/output interpro/interproscan:5.75-106.0 \       # mount ... folder ...
 --input /input/xxx_canonical.fasta \                            # specify input file
@@ -133,7 +133,7 @@ docker run --rm \
 
 # command to copy - adjust input file name
 # if necessary adjust InterProScan version
-docker run --rm -u $(id -u):$(id -g) -v $PWD/interproscan-5.75-106.0/data:/opt/interproscan/data -v $PWD/work:/input -v $PWD/temp:/temp -v $PWD/output:/output interpro/interproscan:5.75-106.0 --input /input/xxx.fasta --output-dir /output --tempdir /temp --cpu 18
+docker run --rm -u $(id -u):$(id -g) -v $PWD/interproscan-5.75-106.0/data:/opt/interproscan/data -v $PWD/input:/input -v $PWD/temp:/temp -v $PWD/output:/output interpro/interproscan:5.75-106.0 --input /input/xxx.fasta --output-dir /output --tempdir /temp --cpu 18
 
 
 
