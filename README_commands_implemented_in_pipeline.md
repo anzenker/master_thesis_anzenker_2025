@@ -100,29 +100,40 @@ emapper.py  -m diamond --itype proteins -i xxx_transdecoder.pep -o NAME_PREFIX -
 ## 2. Fucntional Annotation Outside the Pipeline
 # 2.1. InterProScan annotation **(planned)**
 It was decided to not include InterProScan into the Nextflow pipeline generated during this project. It caused memory issues while building the docker container for the pipeline. Additionally InterProScan provides an already available docker container which is easy to use. 
-To install and run InterProScan with their docker container follow the commands listed below or visit the website [https://interproscan-docs.readthedocs.io/en/v5/HowToUseViaContainer.html].
+To install and run InterProScan with their docker container follow the commands listed below or visit the website [https://interproscan-docs.readthedocs.io/en/v5/HowToUseViaContainer.html] & the official docker website [https://hub.docker.com/r/interpro/interproscan].
 ```
 docker pull interpro/interproscan:5.74-105.0
 # ...
 # Status: Downloaded newer image for interpro/interproscan:5.74-105.0
 # docker.io/interpro/interproscan:5.74-105.0
 
+# download InterProScan database
+
+
+# make working directories
 mkdir input temp output
 
+# copy fasta file
 cp PATH/TO/transcriptome.fa /input
 
+# command with explanations
+#run InterProScan via docker
 docker run --rm \
-    -u $(id -u):$(id -g) \
-    -v $PWD/interproscan-5.74-105.0/data:/opt/interproscan/data \
-    -v $PWD/input:/input \
-    -v $PWD/temp:/temp \
-    -v $PWD/output:/output \
-    interpro/interproscan:5.74-105.0 \
-    --input /input/stringtie2_AC_PROM_Q10_noAR_both_transcripts.fa \
-    --output-dir /output \ 
-    --tempdir /temp \ 
-    --cpu 8
-19/06/2025 12:51:38:378 Welcome to InterProScan-5.74-105.0 
+-u $(id -u):$(id -g) \                                          # run container as my current user, not root
+-v $PWD/interproscan-5.75-106.0/data:/opt/interproscan/data \   # mount local folder into container
+-v $PWD/work:/input \                                           # mount ... folder ...
+-v $PWD/temp:/temp \                                            # mount ... folder ...
+-v $PWD/output:/output interpro/interproscan:5.75-106.0 \       # mount ... folder ...
+--input /input/xxx_canonical.fasta \                            # specify input file
+--output-dir /output \
+--tempdir /temp \
+--cpu 18
+
+# command to copy - adjust input file name
+# if necessary adjust InterProScan version
+docker run --rm -u $(id -u):$(id -g) -v $PWD/interproscan-5.75-106.0/data:/opt/interproscan/data -v $PWD/work:/input -v $PWD/temp:/temp -v $PWD/output:/output interpro/interproscan:5.75-106.0 --input /input/xxx.fasta --output-dir /output --tempdir /temp --cpu 18
+
+
 
 ```
 
