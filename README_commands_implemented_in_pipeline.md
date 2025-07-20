@@ -107,8 +107,10 @@ docker pull interpro/interproscan:5.74-105.0
 # Status: Downloaded newer image for interpro/interproscan:5.74-105.0
 # docker.io/interpro/interproscan:5.74-105.0
 
-# download InterProScan database
-
+# download InterProScan database (optional: md5sum check to verify the download)
+curl -O http://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.75-106.0/alt/interproscan-data-5.75-106.0.tar.gz.md5
+# unpack download
+tar -pxzf interproscan-data-5.75-106.0.tar.gz
 
 # make working directories
 mkdir input temp output
