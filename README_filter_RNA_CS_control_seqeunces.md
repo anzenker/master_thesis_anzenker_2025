@@ -21,7 +21,7 @@ minimap2 -ax map-ont rna_cs_control.fasta your_raw_reads.fasta > cs_mapped.sam
 <a name="extract"></a>
 ## 3. Extract read IDs
 First column in a SAM file holds the read ID and the 5th column holds the mapping quality (MAPQ). This command checks the first column that it is not a header row (starts with @) and checks each 5th row if it is greater than 0. From all rows complying to these conditions the read ID is written into a txt file.
-For more info on SAM file format see here [!README_file_formats.md]
+For more info on SAM file format see here [`README_file_formats.md`](README_file_formats.md)
 ```
 awk '$1 !~ /^@/ && $5 > 0 {print $1}' cs_mapped.sam > read_ids.txt
 ```
