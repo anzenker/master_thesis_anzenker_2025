@@ -2,8 +2,8 @@
 
 ###### ================================================================================
 ###### OVERVIEW
-+ 1. [ Scientific Objective ](#sci-obj)
-+ 2. [ Used data sets ](#data)
++ 1. [ this Repository ](#rep)
++ 2. [ nanoTome Pipeline ](#nanotome)
 + 3. [ Hardware and Operating System ](#OS)
 + 4. [ Installation of required software  ](#install)
     * 4.1 [ General software requirements ](#gensof)
@@ -17,35 +17,18 @@
 + 10. [ Abbreviations ](#abbrev)
 ###### ================================================================================
 
-<a name="sci-obj"></a>
-## 1. Scientific Objective 
-This study aims to investigate isoform diversity and parental gene
-    contribution in the parthenogenetic lizard *A. neomexicanus*. Due to its hybrid
-    genomic background, this species exhibits transcriptomic complexity, which can
-    be examined through long-read RNA sequencing.
-    
-Using genome-guided transcriptome assembly with the use of a genome assembled from both parental species (*A. marmoratus* and *A. arizonae*), the goal is to reconstruct and compare transcriptomes of the parental species and *A. neomexicanus*, based on gene usage and isoform diversity. This is done using ONT direct RNA sequencing.
+<a name="rep"></a>
+## 1. This Repository
+This repository offers a guide to assemble a Transcriptome from Oxfort Nanopore Technologies (ONT) direct RNA (dRNA) sequencing data with a reference genome as a guide.
 
-Transcriptome completeness will be assessed using BUSCO, and initial fucntional annotation will be performed (eggNOG, InterProScan, UniProt).
+<a name="nanotome"></a>
+## 2. nanoTome Pipeline
 
-By comparing the transcriptomes of the parental species and their hybrid offspring, the study will provide insights into how hybridization affects isoform diversity and gene expression. 
+The nanoTome pipeline is designed to assemble transcriptomes from Oxford Nanopore Technologies (ONT) direct RNA sequencing (dRNA-seq) data, using a reference genome as a guide.
 
-All steps from Transcriptome Reconstruction and fuctional annotation (except InterProScan) will be implemented in a reproducible Nextflow pipeline to enable
-    future analyses of additional tissue samples or samples from the parental species. 
+It combines steps for reconstructing the transcriptome, evaluating its completeness with BUSCO Vertebrata, and performing functional annotation with eggNOG. By this, the workflow provides a reproducible and user-friendly solution that saves time for assessing the quality and completeness of dRNA-seq data for further downstream analyses.
 
-<a name="data"></a>
-## 2. Used data sets 
-#### a. Oxford Nanopore direct RNA seqeuncing data 
-    - Aspidoscelis neomexicanus - liver mRNA
-    - SQK RNA-004
-    - PromethION
-#### b. Oxford Nanopore direct RNA seqeuncing data 
-    - Aspidoscelis marmoratus - liver mRNA
-    - SQK RNA-004
-    - PromethION 
-#### c. Genome Assembly 
-    - Aspidoscelis marmoratus
-    - Aspidoscelis arizonae
+The nanoTome pipeline originates from a Master thesis project studying hybridization effects in the parthenogenetic species Aspidoscelis neomexicanus and its sexual parental species, A. marmoratus and A. arizonae. Since assembling a single transcriptome involves more than one time-consuming step, the aim was to combine and automate most of the process for efficient analysis of multiple tissue samples and species. The pipeline enables quicker and standardized transcriptome assembly, preparing the data for subsequent analyses.
     
 <a name="OS"></a>
 ## 3. Hardware and Operating System 
@@ -59,7 +42,7 @@ All steps from Transcriptome Reconstruction and fuctional annotation (except Int
 ### Software which must be installed manually:
 - [4.1 General Software Requirements](#gensof)
 - [4.2 Preprocessing](#prepro)
-- [4.3.x InterProScan](#interproscan)
+- UniProt Annotation via blastp
 
 For the rest there are two options of installing the required software:
 
@@ -69,8 +52,8 @@ For each tool, a link to the official installation instructions is provided.
 - [4.3 Transcriptome Reconstruction](#trans-recon)
 - [4.4 Transcriptome Annotation](#trans-anno)
 
-### Option 2: Docker Image (recommended for main analysis):
-For steps [4.3 Transcriptome Reconstruction](#trans-recon) and [4.4 Transcriptome Annotation](#trans-anno), a prebuilt Dockerfile is available. It contains all necessary tools (except InterProScan).
+### Option 2: Use the available Docker Image (recommended for main analysis):
+For steps [4.3 Transcriptome Reconstruction](#trans-recon) and [4.4 Transcriptome Annotation](#trans-anno), a prebuilt Docker Image is available. It contains all necessary tools (except UniProt annotation).
 This Docker image can be used together with the provided Nextflow pipeline for easy and reproducible analysis.
 A description of how this is done is provided in [`README_Master_Thesis_commands_used.md`](README_Master_Thesis_commands_used.md).
 
