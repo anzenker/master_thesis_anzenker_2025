@@ -1,69 +1,41 @@
 FROM continuumio/miniconda3
 
-# Set working directory
-WORKDIR /testing
+LABEL maintainer="Annika Zenker <anzenker@students.uni-mainz.de"
+LABEL description="Docker image for the nanoTome pipeline: long-read transcriptome analysis with Nanopore dRNA-seq data."
+LABEL version="1.0"
 
 # Prepare conda
 RUN conda init bash
 RUN conda config --set auto_activate_base false
+
+# Install mamba
 RUN conda install -n base -c conda-forge mamba
-#RUN mamba install -c conda-forge -c bioconda busco=5.8.2
-#RUN mamba install bioconda::seqkit bioconda::transdecoder
+
 # Install dependencies via conda
 RUN mamba install -y -c conda-forge -c bioconda \
-    seqkit \
     transdecoder \
     python=3.10 \
     pip \
-    biopython \
-    pandas \
     bbmap \
     blast \
+    seqkit \
     augustus \
     metaeuk \
     prodigal \
     hmmer \
     sepp \
-    r-base \
-    r-ggplot2 \
     eggnog-mapper \
-    blast \
  && conda clean -a
 
-# Copy environment definition into container
-#COPY environment_test.yml /tmp/environment_test.yml
-
-# Create the environment and clean cache
-#RUN conda env create -f /tmp/environment_test.yml && conda clean -a
-
-# Set PATH so the environment is used
-#ENV PATH /opt/conda/envs/busco_env/bin:$PATH
+# Install python packages
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir pandas matplotlib Bio
 
-# Clone BUSCO repo and install
-WORKDIR /opt
-RUN git clone https://gitlab.com/ezlab/busco.git
-WORKDIR /opt/busco
-RUN python -m pip install .
-
-
-# Make sure busco is on PATH
-ENV PATH="$PATH:/opt/busco/bin"
-# Test BUSCO version
-RUN busco --version
-
-#***************************************************************************************************
-
-######################
-#install dependencies#
-######################
+# Install dependencies
 RUN apt-get update -y && apt-get install -y \
-    apt-utils \
     bzip2 \
     gcc \
     make \
-    ncurses-dev \
     wget \
     zlib1g-dev \
     libncurses5-dev \
@@ -73,12 +45,13 @@ RUN apt-get update -y && apt-get install -y \
     libssl-dev \
     ca-certificates \
     curl \
-    g++ \
-    gawk && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    g++ && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 #***************************************************************************************************
 
+################
+#Java#
+################
 # Install Java
 RUN apt-get update --allow-releaseinfo-change && \
     apt-get install -y openjdk-17-jdk-headless && \
@@ -86,7 +59,20 @@ RUN apt-get update --allow-releaseinfo-change && \
     rm -rf /var/lib/apt/lists/*
 #***************************************************************************************************
 
+################
+#BUSCO#
+################
+# Clone BUSCO repo and install
+WORKDIR /opt
+RUN git clone https://gitlab.com/ezlab/busco.git
+WORKDIR /opt/busco
+RUN python -m pip install .
 
+# Make sure busco is on PATH
+ENV PATH="$PATH:/opt/busco/bin"
+# Test BUSCO version
+RUN busco --version
+#***************************************************************************************************
 
 ################
 #Samtools 1.3.1#
@@ -153,22 +139,6 @@ RUN wget http://ccb.jhu.edu/software/stringtie/dl/gffread-0.12.7.tar.gz && \
     cd gffread && make
 # Add to PATH
 ENV PATH="$PATH:${GFFREAD_INSTALL_DIR}"
-#***************************************************************************************************
-
-
-################
-#seqkit 2.10.0#
-################
-ENV SEQKIT_VERSION=2.10.0
-ENV SEQKIT_INSTALL_DIR=/opt/seqkit_f
-# download & extract & install
-WORKDIR /opt
-RUN wget https://github.com/shenwei356/seqkit/releases/download/v2.10.0/seqkit_linux_amd64.tar.gz && \
-    tar -xzf seqkit_linux_amd64.tar.gz && \
-    rm seqkit_linux_amd64.tar.gz && \
-    cp seqkit seqkit_f
-# Add to PATH
-ENV PATH="$PATH:${SEQKIT_INSTALL_DIR}"
 #***************************************************************************************************
 
 ################
