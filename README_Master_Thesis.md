@@ -4,13 +4,13 @@
 ###### OVERVIEW
 + 1. [ This Repository ](#rep)
 + 2. [ Hardware and Operating System ](#OS)
-+ 4. [ Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data ](#guide)
-    * 4.1 [ Basecalling & Preprocessing ](#prepros)
-    * 4.2 [ nanoTome Pipeline ](#nanotome)
-    * 4.3 [ Additional Annoation ](#addanno)
-+ 5. [ Some file formats explained ](#file-formats)
-+ 6. [ Some extra commands ](#extra)
-+ 7. [ Abbreviations ](#abbrev)
++ 3. [ Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data ](#guide)
+    * 3.1 [ Basecalling & Preprocessing ](#prepros)
+    * 3.2 [ nanoTome Pipeline ](#nanotome)
+    * 3.3 [ Additional Annoation ](#addanno)
++ 4. [ Some file formats explained ](#file-formats)
++ 5. [ Some extra commands ](#extra)
++ 6. [ Abbreviations ](#abbrev)
 ###### ================================================================================
 
 <a name="rep"></a>
@@ -28,38 +28,15 @@ All steps except dorado basecalling were successfully executed on Linux-based sy
 
 Dorado basecalling was executed on Linux-based systems (x86_64) equipped either with NVIDIA RTX 6000 Ada Generation or NVIDIA Tesla V100-DGXS-32GB GPUs.
 
-<a name="install"></a>
-## 3. Installation of required software 
-
-### Software which must be installed manually:
-- [4.1 General Software Requirements](#gensof)
-- [4.2 Preprocessing](#prepro)
-- UniProt Annotation via blastp
-
-For the rest there are two options of installing the required software:
-
-### Option 1: Manual Installation
-You can install each tool individually.
-For each tool, a link to the official installation instructions is provided.
-- [4.3 Transcriptome Reconstruction](#trans-recon)
-- [4.4 Transcriptome Annotation](#trans-anno)
-
-For this option go to [README_manual_software_installation.md](README_manual_software_installation.md)
-
-### Option 2: Use the available Docker Image (recommended for main analysis):
-For steps [4.3 Transcriptome Reconstruction](#trans-recon) and [4.4 Transcriptome Annotation](#trans-anno), a prebuilt Docker Image is available. It contains all necessary tools (except UniProt annotation).
-This Docker image can be used together with the provided Nextflow pipeline for easy and reproducible analysis.
-A description of how this is done is provided in [`README_Master_Thesis_commands_used.md`](README_Master_Thesis_commands_used.md).
-
 <a name="guide"></a>
-## 4. Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data
+## 3. Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data
 
 <a name="prepros"></a>
-## 4.1. Basecalling & Preprocessing
+## 3.1. Basecalling & Preprocessing
 xxx
 
 <a name="nanotome"></a>
-## 4.2. nanoTome Pipeline
+## 3.2. nanoTome Pipeline
 
 The nanoTome pipeline is designed to assemble transcriptomes from Oxford Nanopore Technologies (ONT) direct RNA sequencing (dRNA-seq) data, using a reference genome as a guide.
 
@@ -77,6 +54,7 @@ These tools are needed to set up the environment and run the pipeline.
 
 
 **Download and prepare necessary databases for the pipeline:**
+The databases only need to be downloaded if these steps want to be executed with the workflow.
 
 - **EggNOG** (~13G & ~9G & ~7G)
 ```
@@ -108,7 +86,7 @@ tar -xzf vertebrata_odb10.2024-01-08.tar.gz
 ```
 
 <a name="pipe_run"></a>
-#### 4.2.2 Run the nanoTome pipeline
+#### 3.2.2 Run the nanoTome pipeline
 The nextflow pipeline runs on a Docker image by default.
 
 ```
@@ -154,7 +132,7 @@ nextflow run main.nf --raw_reads raw_reads.fastq --genome genome.fa --threads NO
 │           └── ...
 ```
 <a name="manual"></a>
-#### 4.2.4 Code implemented into the nanoTome pipeline
+#### 3.2.4 Code implemented into the nanoTome pipeline
 All code implemented intot the pipeline can be found in [README_commands_implemented_in_pipeline.md](README_commands_implemented_in_pipeline.md) for manual execution.
 
 <a name="addanno"></a>
