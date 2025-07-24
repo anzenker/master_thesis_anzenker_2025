@@ -2,17 +2,21 @@
 
 ###### ================================================================================
 ###### OVERVIEW
-+ 1. [ this Repository ](#rep)
++ 1. [ This Repository ](#rep)
++ 2. [ Hardware and Operating System ](#OS)
++ 3. [ Installation of required software  ](#install)
+    * 3.1 [ General software requirements ](#gensof)
+    * 3.2 [ Preprocessing ](#prepro)
+    * 3.3 [ Transcriptome Reconstruction ](#trans-recon)
+    * 3.4 [ Transcriptome Annotation ](#trans-anno)
++ 4. [ Guide to Assemble and Annotate a Transcriptome from ONT dRNA-seq data ](#guide)
++ 1. Preprocessing
 + 2. [ nanoTome Pipeline ](#nanotome)
-+ 3. [ Hardware and Operating System ](#OS)
-+ 4. [ Installation of required software  ](#install)
-    * 4.1 [ General software requirements ](#gensof)
-    * 4.2 [ Preprocessing ](#prepro)
-    * 4.3 [ Transcriptome Reconstruction ](#trans-recon)
-    * 4.4 [ Transcriptome Annotation ](#trans-anno)
++ 3. 
+
 + 5. [ Steps to recreate the results ](#steps)
 + 6. [ Some File Formats explained ](#file-formats)
-+ 8. [ References](#ref)
+
 + 9. [ Some extra commands ](#extra)
 + 10. [ Abbreviations ](#abbrev)
 ###### ================================================================================
@@ -21,23 +25,19 @@
 ## 1. This Repository
 This repository offers a guide to assemble a Transcriptome from Oxfort Nanopore Technologies (ONT) direct RNA (dRNA) sequencing data with a reference genome as a guide.
 
-<a name="nanotome"></a>
-## 2. nanoTome Pipeline
+This guide is separated into 3 Parts:
+1. Basecalling & Preprocessing of the Raw Seqeuncing Data
+2. nanoTome pipeline: Transcriptome Assembly & Annotation
+3. Additional Annotation
 
-The nanoTome pipeline is designed to assemble transcriptomes from Oxford Nanopore Technologies (ONT) direct RNA sequencing (dRNA-seq) data, using a reference genome as a guide.
-
-It combines steps for reconstructing the transcriptome, evaluating its completeness with BUSCO Vertebrata, and performing functional annotation with eggNOG. By this, the workflow provides a reproducible and user-friendly solution that saves time for assessing the quality and completeness of dRNA-seq data for further downstream analyses.
-
-The nanoTome pipeline originates from a Master thesis project studying hybridization effects in the parthenogenetic species Aspidoscelis neomexicanus and its sexual parental species, A. marmoratus and A. arizonae. Since assembling a single transcriptome involves more than one time-consuming step, the aim was to combine and automate most of the process for efficient analysis of multiple tissue samples and species. The pipeline enables quicker and standardized transcriptome assembly, preparing the data for subsequent analyses.
-    
 <a name="OS"></a>
-## 3. Hardware and Operating System 
-- Linux compsysgen2 5.15.0-140-generic #150-Ubuntu SMP; x86_64 x86_64 x86_64 GNU/Linux; Vendor ID: GenuineIntel, Model name: Intel(R) Xeon(R) Gold 5120 CPU @ 2.20GHz, CPU family: 6
-- Linux compsysgen3 5.15.0-140-generic #150-Ubuntu SMP; x86_64 x86_64 x86_64 GNU/Linux; Vendor ID: GenuineIntel, Model name: Intel(R) Xeon(R) Gold 6438Y+, CPU family: 6
-- Linux Olymp 5.4.0-212-generic #232-Ubuntu SMP, x86_64 x86_64 x86_64 GNU/Linux, Vendor ID: GenuineIntel, Model name: Intel(R) Xeon(R) CPU E5-2698 v4 @ 2.20GHz, CPU family: 6
+## 2. Hardware and Operating System 
+All steps except dorado basecalling were successfully executed on Linux-based systems with a x86_64 architecture.
+
+Dorado basecalling was executed on Linux-based systems (x86_64) equipped either with NVIDIA RTX 6000 Ada Generation or NVIDIA Tesla V100-DGXS-32GB GPUs.
 
 <a name="install"></a>
-## 4. Installation of required software 
+## 3. Installation of required software 
 
 ### Software which must be installed manually:
 - [4.1 General Software Requirements](#gensof)
@@ -52,75 +52,87 @@ For each tool, a link to the official installation instructions is provided.
 - [4.3 Transcriptome Reconstruction](#trans-recon)
 - [4.4 Transcriptome Annotation](#trans-anno)
 
+For this option go to [README_manual_software_installation.md](README_manual_software_installation.md)
+
 ### Option 2: Use the available Docker Image (recommended for main analysis):
 For steps [4.3 Transcriptome Reconstruction](#trans-recon) and [4.4 Transcriptome Annotation](#trans-anno), a prebuilt Docker Image is available. It contains all necessary tools (except UniProt annotation).
 This Docker image can be used together with the provided Nextflow pipeline for easy and reproducible analysis.
 A description of how this is done is provided in [`README_Master_Thesis_commands_used.md`](README_Master_Thesis_commands_used.md).
 
- <a name="gensof"></a>
-## 4.1 General software requirements
+
+
+
+
+
+<a name="nanotome"></a>
+## 2. nanoTome Pipeline
+
+The nanoTome pipeline is designed to assemble transcriptomes from Oxford Nanopore Technologies (ONT) direct RNA sequencing (dRNA-seq) data, using a reference genome as a guide.
+
+It combines steps for reconstructing the transcriptome, evaluating its completeness with BUSCO Vertebrata, and performing functional annotation with eggNOG. By this, the workflow provides a reproducible and user-friendly solution that saves time for assessing the quality and completeness of dRNA-seq data for further downstream analyses.
+
+The nanoTome pipeline originates from a Master thesis project studying hybridization effects in the parthenogenetic species Aspidoscelis neomexicanus and its sexual parental species, A. marmoratus and A. arizonae. Since assembling a single transcriptome involves more than one time-consuming step, the aim was to combine and automate most of the process for efficient analysis of multiple tissue samples and species. The pipeline enables quicker and standardized transcriptome assembly, preparing the data for subsequent analyses.
+
+<a name="pipe_install"></a>
+#### 2.1 Installation Requirements
 These tools are needed to set up the environment and run the pipeline.
-<a name="miniforge3"></a>
-### 4.1.1 [miniforge3][1] [[1]]
-Used to create environments with conda and mamba for easier package managment and software installation.
-### 4.1.2 [nextflow][3] [[3]]
-Workflow manager to run the analysis pipeline in a reproducible way.
-<a name="docker"></a>
-### 4.1.3 [docker][4] [[4]]
-Allows to run software in containers. Required for using the provided Docker Image.
-<a name="xxx"></a>
-### 4.1.4 [Java](conda_java20_env.yml)
-OpenJDK version 20. Required to run Nextflow pipeline. Installed in a conda evironment.
+- **[miniforge3]()**: Used to create environments with conda and mamba for easier package managment and software installation.
+- **[nextflow]()**: Workflow manager to run the analysis pipeline in a reproducible way.
+- **[docker]()**: Allows to run software in containers. Required for using the provided Docker Image.
+- **Java [conda_java20_env.yml](conda_java20_env.yml)**: OpenJDK version 20. Required to run Nextflow pipeline. Installed in a conda evironment.
 
-<a name="prepro"></a>
-## 4.2 Preprocessing 
-These tools are used before transcriptome reconstruction, to basecall, evaluate and refine the raw sequencing data.
-<a name="dorado"></a>
-### 4.2.1 [dorado][5] [[5]]
-Used to convert raw ONT .pod5 files into .ubam basecalled reads.
-<a name="pycoQC"></a>
-### 4.2.2 [pycoQC][6] [[6]]
-Generates metrics and interactive plots for ONT seqeuncing data.
-<a name="NanoPlot"></a>
-### 4.2.3 [NanoPlot][7] [[7]]
-Generates metrics and plots for ONT seqeuncing data.
-<a name="NanoComp"></a>
-### 4.2.4 [NanoComp][8] [[8]]
-Compares multiple runs of long read sequencing data and alignments based on QC metrics and plots.
+<a name="pipe_run"></a>
+#### 2.2 Run the nanoTome pipeline
+The nextflow pipeline runs on a Docker image by default.
 
-<a name="trans-recon"></a>
-## 4.3 Transcriptome Reconstruction 
-these tools are used to reconstruct the transcriptome from the ONT dRNA sequencing reads using a reference genome file.
-<a name="minimap2"></a>
-### 4.3.1 [minimap2][9] [[9]]
-Aligns the raw seqeuncign reads to the reference genome in spliced mode.
+```
+nextflow run main.nf --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS --outdir OPTIONAL --color OPTIONAL
+```
 
-<a name="samtools"></a>
-### 4.3.2 [samtools][10] [[10]]
-Sorts and indexes the alignment files (.bam/.sam) generated by minimap2.
+*Optionally the paramters --outdir and --color can be given to the command. Be aware that --color requires a hex color code e.g. #688e26*
 
-<a name="stringtie2"></a>
-### 4.3.3 [stringtie2][11] [[11]]
-Reconstruct the transcriptome from the minimap2 mappings and outputs a GTF file containing transcript structure information.
+<a name="pipe_dir"></a>
+#### 2.3 nanoTome results directory
+```
+.
+└──  RESULTS
+│   ├── **1_minimap2_output**
+│       ├── xxx_mapped.bam
+│       └── xxx_mapped.bam.bai
+│   ├── 2_stringtie2_transcriptome
+│       └── stringtie2_xxx_transcripts.gtf
+│   ├── 3_gffread_transcriptome
+│       └── stringtie2_xxx_transcripts.fasta
+│   ├── 5_canonical_transcriptome
+│       ├── stringtie2_xxx_transcripts_canonical.fasta
+│       ├── stringtie2_xxx_transcripts_canonical_ids.txt
+│       └── transcript_ids_and_coverage.tsv
+│   ├── 6_frame_selection
+│       └── stringtie2_xxx.transdecoder_dir
+│           └── longest_orfs.pep
+│   ├── 7_busco_vertebrata_completeness
+│   ├── 8_plots
+│       ├── busco_output_xxx_transcripts
+│       ├── logs/
+│           └── ...
+│       ├── run_vertebrata_odb10/
+│           ├── full_table.tsv
+│           ├── short_summary.txt
+│           └── ...
+│       └── tmp/
+│           └── ...
+│       ├── busco_output_xxx_transcripts_canonical
+│           ├── ... (same as other busco folder)
+│   ├── 8_plots
+│       ├── no_all_transcripts_vs_canonical_transcripts.png
+│       ├── stringtie2_AC73_Amarm_Q10_noR_mapped_transcripts_canonical_length_distribution.png
+│       ├── stringtie2_xxx_isoform_per_gene_barplot.png
+│       ├── stringtie2_xxx_isoform_per_gene_barplot.txt
+│       └── stringtie2_AC73_Amarm_Q10_noR_mapped_transcripts_length_distribution.png
+```
+...
 
-<a name="gffread"></a>
-### 4.3.4 [gffread][12] [[12]]
-Extracts transcript seqeunces from the genome assembly using the stringtie GTF output and generated a fasta file.
 
-<a name="trans-anno"></a>
-## 4.4 Transcriptome Annotation
-These tools annotate the reconstructed transcripts with protein function information.
-
-<a name="eggNOG"></a>
-### 4.3.1 [eggNOG][13] [[13]]
-Annotates transcripts using orthology-based functional information.
-
-<a name="interproscan"></a>
-### 4.3.2 [InterProScan][14] [[14]]
-Identifies protein domains and motifs. Run manually outside the pipeline.
-
-<a name="uniprot"></a>
-### 4.3.3 [UniProt][15] [[15]] - xxx
 
 ## 4.5 Comparative Analyses
 ????
@@ -133,51 +145,7 @@ The steps are explained in [`README_Master_Thesis_commands_used.md`](README_Mast
 ## 6. Some file formats explained
 Some file formats used to analyse the data are explained in  [`README_file_formats.md`](README_file_formats.md).
 
-<a name="dirrra"></a>
-#### 5.1.a. Directory Structure
-Below is the directory structure which will be generated by the Nextflow pipeline. 
 
-```
-.
-└──  xxx
-│   ├── xxx
-│       ├── xxx
-│       ├── xxx
-│       ├── xxxx
-│       └── xxx
-│           ├── ...
-│           ├── xxx
-│               ├── ...
-│               ├── xxx
-│               └── ...
-│           └── ...
-│   ├── xxx
-│   ├── xxx
-│   └── xxx
-```
-...
-
-
-<a name="ref"></a>
-## 9. References
-[1]: https://github.com/conda-forge/miniforge
-[2]: https://www.nextflow.io/docs/latest/install.html
-[3]: https://docs.docker.com/engine/install/ubuntu/
-[4]: conda_java20_env.yml
-
-[5]: https://github.com/nanoporetech/dorado
-[6]: https://a-slide.github.io/pycoQC/installation/
-[7]: https://github.com/wdecoster/NanoPlot
-[8]: https://github.com/wdecoster/nanocomp
-
-[9]: https://lh3.github.io/minimap2/minimap2.html "minimap2 user guide"
-[10]: https://www.htslib.org/doc/samtools.html "samtools user guide"
-[11]: https://github.com/skovaka/stringtie2
-[12]: https://github.com/gpertea/gffread
-
-[13]: https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.13
-[14]: https://interproscan-docs.readthedocs.io/en/v5/
-[15]: UniProt
 
 <a name="extra"></a>
 ## 9. Some extra commands
