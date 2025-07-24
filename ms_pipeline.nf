@@ -6,6 +6,7 @@ params.outdir = 'RESULTS'
 params.threads = 1
 params.skip_eggnog = false
 params.help = false
+params.color = "#C79FEF" //lilac
 
 //include { minimap2RawToGenome } from './modules/minimap2RawToGenome.nf'
 //include { stringtie2Transcriptome } from './modules/stringtie2Transcriptome.nf'
@@ -41,11 +42,11 @@ def helpMessage() {
             --threads                   no. of threads
             --outdir                    The output directory where the results will be saved
             -w/--work-dir               The temporary directory where intermediate data will be saved
+            --color                     Specific color for output plots created with Python. Default color is lavender (#C79FEF).
         
         Process Options:
-
             --skip_eggnog               Skip EggNOG annotation step
-            --skip_blast                Skip blastp annotation step
+
         """.stripIndent()
     }
 
@@ -82,7 +83,7 @@ process get_software_versions {
 }
 
 process buscoVertebrataCompleteness {
-    publishDir "${params.outdir}/7_busco_vertebrata_completeness", mode: 'copy'
+    publishDir "${params.outdir}/6_busco_vertebrata_completeness", mode: 'copy'
 
     input:
         val threads
@@ -102,7 +103,7 @@ process buscoVertebrataCompleteness {
 }
 
 process canonicalBestCov1 {
-    publishDir "${params.outdir}/5_canonical_transcriptome", mode:'copy'
+    publishDir "${params.outdir}/4_canonical_transcriptome", mode:'copy'
 
     input: 
     path input_gtf_file
@@ -117,7 +118,7 @@ process canonicalBestCov1 {
 }
 
 process canonicalBestCov2 {
-    publishDir "${params.outdir}/5_canonical_transcriptome", mode:'copy'
+    publishDir "${params.outdir}/4_canonical_transcriptome", mode:'copy'
 
     input:
     path input_tsv_file
@@ -147,7 +148,7 @@ process canonicalBestCov2 {
 }
 
 process canonicalBestCov3 {
-    publishDir "${params.outdir}/5_canonical_transcriptome", mode:'copy'
+    publishDir "${params.outdir}/4_canonical_transcriptome", mode:'copy'
 
     input:
     path input_tsv_file
@@ -230,6 +231,7 @@ process plotIsoformPerGene {
     input:
     path python_script
     path gtf_input_file
+    val color
     
     output:
     path "${gtf_input_file.baseName}_isoform_per_gene_barplot.png"
@@ -240,9 +242,10 @@ process plotIsoformPerGene {
     """
     #!/bin/bash
     
-    python $python_script $gtf_input_file
+    python $python_script $gtf_input_file "$color"
     """
 }
+
 process plotLengthDistribution {
     publishDir "${params.outdir}/8_plots", mode: 'copy'
 
@@ -277,13 +280,33 @@ process plotLengthDistribution {
     """ 
 }
 
+process plotORFStatistics {
+    publishDir "${params.outdir}/8_plots", mode: 'copy'
+
+    input:
+    path python_script
+    path input_fasta
+    path input_pep
+    val plot_color
+
+    output:
+    path "${input_fasta.baseName}_orf_prediction_barplot.png"
+    path "${input_fasta.baseName}_orf_categories_pie_chart.png"
+
+    script:
+    """
+    python $python_script -input_fasta $input_fasta -input_pep $input_pep -plot_color "$plot_color"
+    """
+}
+
 process plotTotalTranscripts {
     publishDir "${params.outdir}/8_plots", mode: 'copy'
 
     input:
     path python_script
-    path input_fasta_file
-    path input_pep_file
+    path input_fasta_1
+    path input_fasta_2
+    val plot_color
     
     output:
     path "no_all_transcripts_vs_canonical_transcripts.png"
@@ -292,7 +315,7 @@ process plotTotalTranscripts {
     """
     #!/bin/bash
     
-    python $python_script $input_fasta_file $input_pep_file
+    python $python_script $input_fasta_1 $input_fasta_2 $plot_color
     """ 
 }
 
@@ -315,7 +338,7 @@ process stringtie2Transcriptome {
 
 //also include TransDecoder.Predict with homology options????
 process transDecoderORF {
-    publishDir "${params.outdir}/6_frame_selection", mode: 'copy'
+    publishDir "${params.outdir}/5_frame_selection", mode: 'copy'
 
     input:
     path input_fasta_file
@@ -335,8 +358,7 @@ process transDecoderORF {
 
 // does not work due to memory issues
 process uniprotAnnotation {
-    publishDir "${params.outdir}/5_frame_selection", mode: 'copy'
-    container 'simp-test:latest'
+    publishDir "${params.outdir}/NONE", mode: 'copy'
 
     input:
     path input_orf_pep
@@ -395,7 +417,7 @@ workflow {
     def busco_downloads_path = file('./bin/busco_downloads/')
     def python_script_path_1 = file('./python_scripts/plot_transcript_numbers.py')
     def python_script_path_2 = file('./python_scripts/plot_isoform_per_gene.py')
-    def python_script_path_3 = file('./python_scripts/plot_transcript_numbers.py')
+    def python_script_path_3 = file('./python_scripts/plot_orf_statistics.py')
 
 
     //run processes
@@ -457,7 +479,8 @@ workflow {
     //***************************************
     //----------------------------------------
     // plot isoform per gene
-    plotIsoformPerGene(python_script_path_2, stringtie2Transcriptome.out)
+    //def isoform_plot_outdir = "${params.outdir}/8_plots"
+    plotIsoformPerGene(python_script_path_2, stringtie2Transcriptome.out, params.color)
     //----------------------------------------
     //----------------------------------------
     // plot transcriptome length distribution - combine .fasta into channel and run process
@@ -465,7 +488,7 @@ workflow {
     //----------------------------------------
     //----------------------------------------
     // plot comparison of total transcript count
-    plotTotalTranscripts(python_script_path_1, transDecoderORF.out, canonicalBestCov3.out)
+    plotTotalTranscripts(python_script_path_1, gffreadToFasta.out, canonicalBestCov3.out, params.color)
     //----------------------------------------
     //----------------------------------------
     // plot BUSCO output
@@ -473,6 +496,7 @@ workflow {
     //----------------------------------------    
     //----------------------------------------
     // plot ORF category distribution
+    plotORFStatistics(python_script_path_3, canonicalBestCov3.out, transDecoderORF.out, params.color)
 
     //----------------------------------------
     //----------------------------------------
