@@ -73,6 +73,7 @@ emapper.py  -m diamond --itype proteins -i xxx_transdecoder.pep -o NAME_PREFIX -
 
 <a name="pyscr"></a>
 ### 1.7 Custom Python Scripts
+- plot total number Transcriptome vs Canonical Transcriptome
 - plot Isoform per Gene
 - plot ORF distribution
 - plot BUSCO Completeness
