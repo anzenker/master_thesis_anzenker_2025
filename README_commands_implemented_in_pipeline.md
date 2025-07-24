@@ -9,6 +9,7 @@
     * 1.4. [ BUSCO ](#busco)
     * 1.5. [ TransDecoder ](#transdec)
     * 1.6. [ EggNOG ](#eggN)
+    * 1.7. [ Custom Python Scripts ](#pyscr)
    
 ###### ================================================================================
 
@@ -71,7 +72,7 @@ emapper.py  -m diamond --itype proteins -i xxx_transdecoder.pep -o NAME_PREFIX -
 ```
 
 <a name="pyscr"></a>
-### 1.6 Custom Python Scripts
+### 1.7 Custom Python Scripts
 - plot Isoform per Gene
 - plot ORF distribution
 - plot BUSCO Completeness
