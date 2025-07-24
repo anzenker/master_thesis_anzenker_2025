@@ -112,13 +112,21 @@ tar -xzf vertebrata_odb10.2024-01-08.tar.gz
 The nextflow pipeline runs on a Docker image by default.
 
 ```
+# help message
+nextflow run main.nf -help
+
+#run
 nextflow run main.nf --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS
 ```
 
-*Optionally the parameters 
-- --outdir (defines the anme of the output directory) &
-- --color (defines the plot color for the output plots, requires a hex color code e.g. #688e26)
-can be given to the command.*
+*Optional parameters 
+- --outdir NAME     (defines the anme of the output directory) 
+- --color HEX_CODE  (defines the plot color for the output plots, requires a hex color code e.g. #688e26)
+- skip_eggnog true  (runs the workflow without eggNOG annotation)
+- skip_busco true   (runs the workflow without busco analysis)
+- skip_orf          (runs the workflow without orf prediction and without eggNOG annotation)
+- no_plots          (no outout plots are generated from the workflow)
+*
 
 <a name="pipe_dir"></a>
 #### 4.2.3 nanoTome results directory
@@ -145,10 +153,12 @@ can be given to the command.*
 │   ├── 8_plots
 │           └── ...
 ```
+<a name="manual"></a>
+#### 4.2.4 Code implemented into the nanoTome pipeline
+All code implemented intot the pipeline can be found in [README_commands_implemented_in_pipeline.md](README_commands_implemented_in_pipeline.md) for manual execution.
 
 <a name="addanno"></a>
 ## 4.3. Additional Annotation
-
 <a name="up"></a>
 ### 4.3.1 UniProt annotation 
 
