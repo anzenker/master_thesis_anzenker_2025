@@ -1,32 +1,24 @@
-#  Master Thesis - Transcriptome Analyses in Aspidoscelis neomexicanus
+#  Transcriptome Assembly and Annotation with ONT dRNA-seq data
 
 ###### ================================================================================
 ###### OVERVIEW
 + 1. [ This Repository ](#rep)
 + 2. [ Hardware and Operating System ](#OS)
-+ 3. [ Installation of required software  ](#install)
-    * 3.1 [ General software requirements ](#gensof)
-    * 3.2 [ Preprocessing ](#prepro)
-    * 3.3 [ Transcriptome Reconstruction ](#trans-recon)
-    * 3.4 [ Transcriptome Annotation ](#trans-anno)
-+ 4. [ Guide to Assemble and Annotate a Transcriptome from ONT dRNA-seq data ](#guide)
-+ 1. Preprocessing
-+ 2. [ nanoTome Pipeline ](#nanotome)
-+ 3. 
-
-+ 5. [ Steps to recreate the results ](#steps)
-+ 6. [ Some File Formats explained ](#file-formats)
-
-+ 9. [ Some extra commands ](#extra)
-+ 10. [ Abbreviations ](#abbrev)
++ 4. [ Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data ](#guide)
+    * 4.1 [ Basecalling & Preprocessing ](#prepros)
+    * 4.2 [ nanoTome Pipeline ](#nanotome)
+    * 4.3 [ Additional Annoation ](#addanno)
++ 5. [ Some file formats explained ](#file-formats)
++ 6. [ Some extra commands ](#extra)
++ 7. [ Abbreviations ](#abbrev)
 ###### ================================================================================
 
 <a name="rep"></a>
 ## 1. This Repository
-This repository offers a guide to assemble a Transcriptome from Oxfort Nanopore Technologies (ONT) direct RNA (dRNA) sequencing data with a reference genome as a guide.
+This repository offers a guide to assemble a Transcriptome from Oxford Nanopore Technologies (ONT) direct RNA (dRNA) sequencing data with a reference genome as a guide.
 
 This guide is separated into 3 Parts:
-1. Basecalling & Preprocessing of the Raw Seqeuncing Data
+1. Basecalling & Preprocessing of the Raw Sequencing Data
 2. nanoTome pipeline: Transcriptome Assembly & Annotation
 3. Additional Annotation
 
@@ -59,13 +51,15 @@ For steps [4.3 Transcriptome Reconstruction](#trans-recon) and [4.4 Transcriptom
 This Docker image can be used together with the provided Nextflow pipeline for easy and reproducible analysis.
 A description of how this is done is provided in [`README_Master_Thesis_commands_used.md`](README_Master_Thesis_commands_used.md).
 
+<a name="guide"></a>
+## 4. Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data
 
-
-
-
+<a name="prepros"></a>
+## 4.1. Basecalling & Preprocessing
+xxx
 
 <a name="nanotome"></a>
-## 2. nanoTome Pipeline
+## 4.2. nanoTome Pipeline
 
 The nanoTome pipeline is designed to assemble transcriptomes from Oxford Nanopore Technologies (ONT) direct RNA sequencing (dRNA-seq) data, using a reference genome as a guide.
 
@@ -74,81 +68,126 @@ It combines steps for reconstructing the transcriptome, evaluating its completen
 The nanoTome pipeline originates from a Master thesis project studying hybridization effects in the parthenogenetic species Aspidoscelis neomexicanus and its sexual parental species, A. marmoratus and A. arizonae. Since assembling a single transcriptome involves more than one time-consuming step, the aim was to combine and automate most of the process for efficient analysis of multiple tissue samples and species. The pipeline enables quicker and standardized transcriptome assembly, preparing the data for subsequent analyses.
 
 <a name="pipe_install"></a>
-#### 2.1 Installation Requirements
+#### 4.2.1 Installation Requirements
 These tools are needed to set up the environment and run the pipeline.
-- **[miniforge3]()**: Used to create environments with conda and mamba for easier package managment and software installation.
-- **[nextflow]()**: Workflow manager to run the analysis pipeline in a reproducible way.
-- **[docker]()**: Allows to run software in containers. Required for using the provided Docker Image.
-- **Java [conda_java20_env.yml](conda_java20_env.yml)**: OpenJDK version 20. Required to run Nextflow pipeline. Installed in a conda evironment.
+- **[miniforge3](https://github.com/conda-forge/miniforge)**: Used to create environments with conda and mamba for easier package managment and software installation.
+- **[nextflow](https://www.nextflow.io/docs/latest/install.html)**: Workflow manager to run the analysis pipeline in a reproducible way.
+- **[docker](https://docs.docker.com/engine/install/ubuntu/)**: Allows to run software in containers. Required for using the provided Docker Image.
+- **Java [conda_java20_env.yml](conda_java20_env.yml)**: OpenJDK version 20. Required to run Nextflow pipeline. Installed in a conda environment.
+
+
+**Download and prepare necessary databases for the pipeline:**
+
+- **EggNOG** (~13G & ~9G & ~7G)
+```
+eggnog link to database:
+http://eggnog5.embl.de/download/emapperdb-5.0.2/
+
+#download the databases into the 'bin' folder
+cd bin/
+
+wget http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.db.gz
+gunzip eggnog.db
+
+wget http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog_proteins.dmnd.gz
+gunzip eggnog_proteins.dmnd
+
+wget http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.taxa.tar.gz
+tar –xvzf eggnog.taxa.tar.gz
+```
+- **BUSCO** (~ 529M)
+```
+busco link to vertebrata odb10 database
+https://busco-data.ezlab.org/v5/data/lineages/vertebrata_odb10.2024-01-08.tar.gz
+
+#download the databases into the 'bin' folder
+cd bin/
+
+wget https://busco-data.ezlab.org/v5/data/lineages/vertebrata_odb10.2024-01-08.tar.gz
+tar -xzf vertebrata_odb10.2024-01-08.tar.gz
+```
 
 <a name="pipe_run"></a>
-#### 2.2 Run the nanoTome pipeline
+#### 4.2.2 Run the nanoTome pipeline
 The nextflow pipeline runs on a Docker image by default.
 
 ```
-nextflow run main.nf --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS --outdir OPTIONAL --color OPTIONAL
+nextflow run main.nf --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS
 ```
 
-*Optionally the paramters --outdir and --color can be given to the command. Be aware that --color requires a hex color code e.g. #688e26*
+*Optionally the parameters 
+- --outdir (defines the anme of the output directory) &
+- --color (defines the plot color for the output plots, requires a hex color code e.g. #688e26)
+can be given to the command.*
 
 <a name="pipe_dir"></a>
-#### 2.3 nanoTome results directory
+#### 4.2.3 nanoTome results directory
 ```
 .
 └──  RESULTS
-│   ├── **1_minimap2_output**
-│       ├── xxx_mapped.bam
-│       └── xxx_mapped.bam.bai
+│   ├── 1_minimap2_output
+│       └── ...
 │   ├── 2_stringtie2_transcriptome
-│       └── stringtie2_xxx_transcripts.gtf
+│       └── ...
 │   ├── 3_gffread_transcriptome
-│       └── stringtie2_xxx_transcripts.fasta
-│   ├── 5_canonical_transcriptome
-│       ├── stringtie2_xxx_transcripts_canonical.fasta
-│       ├── stringtie2_xxx_transcripts_canonical_ids.txt
-│       └── transcript_ids_and_coverage.tsv
-│   ├── 6_frame_selection
-│       └── stringtie2_xxx.transdecoder_dir
-│           └── longest_orfs.pep
-│   ├── 7_busco_vertebrata_completeness
-│   ├── 8_plots
+│       └── ...
+│   ├── 4_canonical_transcriptome
+│       └── ...
+│   ├── 5_frame_selection
+│       └── ...
+│   ├── 6_busco_vertebrata_completeness
 │       ├── busco_output_xxx_transcripts
-│       ├── logs/
 │           └── ...
-│       ├── run_vertebrata_odb10/
-│           ├── full_table.tsv
-│           ├── short_summary.txt
+│       ├── busco_output_xxx_transcripts_caninical
 │           └── ...
-│       └── tmp/
+│   ├── 7_eggnog_annotation
 │           └── ...
-│       ├── busco_output_xxx_transcripts_canonical
-│           ├── ... (same as other busco folder)
 │   ├── 8_plots
-│       ├── no_all_transcripts_vs_canonical_transcripts.png
-│       ├── stringtie2_AC73_Amarm_Q10_noR_mapped_transcripts_canonical_length_distribution.png
-│       ├── stringtie2_xxx_isoform_per_gene_barplot.png
-│       ├── stringtie2_xxx_isoform_per_gene_barplot.txt
-│       └── stringtie2_AC73_Amarm_Q10_noR_mapped_transcripts_length_distribution.png
+│           └── ...
 ```
-...
 
+<a name="addanno"></a>
+## 4.3. Additional Annotation
 
+<a name="up"></a>
+### 4.3.1 UniProt annotation 
 
-## 4.5 Comparative Analyses
-????
+### Download and make database locally
+```
+UniProt link to database:
+https://www.uniprot.org/help/downloads
 
-<a name="steps"></a>
-## 5. Steps to recreate the results
-The steps are explained in [`README_Master_Thesis_commands_used.md`](README_Master_Thesis_commands_used.md).
+#download the databases into the 'bin' folder
+cd bin/
+
+# download database
+wget https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz
+
+# unzip downloaded fasta file
+gzip -d uniprot_sprot.fasta.gz
+
+# create blast database from fasta file (~310M)
+makeblastdb -in bin/uniprot_sprot.fasta -dbtype prot
+
+```
+
+### Run the annotation
+```
+# blast search of transcripts against UniProt database
+# choose max_target_seq 1 to only receive the top hit
+
+blastp -query transdecoder_dir/longest_orfs.pep  \
+    -db uniprot_sprot.fasta  -max_target_seqs 1 \
+    -outfmt 6 -evalue 1e-5 -num_threads 10 > blastp.outfmt6
+```
 
 <a name="file-formats"></a>
-## 6. Some file formats explained
+## 5. Some file formats explained
 Some file formats used to analyse the data are explained in  [`README_file_formats.md`](README_file_formats.md).
 
 
-
 <a name="extra"></a>
-## 9. Some extra commands
+## 6. Some extra commands
 Command to check the amount of bases in the .fasta or .fastq files:
 ```
 seqkit stats *.fasta
@@ -161,14 +200,9 @@ Command to get amount of reads from .fastq.gz `"^@"` file
 ```
 zcat your_file.fastq.gz | grep -c "^@"
 ```
-Command to split .fastq.gz into specified no. of parts (-p)
-```
-seqkit split2 reads.fq.gz-p 2 -O out -f --by-part-prefix "x_r{read}_"
-    
-```
 
 <a name="abbrev"></a>
-## 9. Abbreviations
+## 7. Abbreviations
 - ONT   Oxford Nanopore
 - QC    Quality Control
 - mRNA  messenger RNA
