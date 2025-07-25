@@ -91,7 +91,7 @@ def process_sequences(input_file, output_ids_path, output_tsv_path, log_path):
 
         log_print("Reading input FASTA / FASTQ file...", log)
         # open input file, 'rt' = read & write
-        with open_func(input_file, "rt") as handle:
+        with open_func(input_file)(input_file, "rt") as handle:
             # handle FASTA/FAST file
             for record in SeqIO.parse(handle, seq_format):
                 total_reads += 1
