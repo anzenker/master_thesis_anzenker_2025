@@ -1,92 +1,202 @@
-## Repository Information
+#  Transcriptome Assembly and Annotation with ONT dRNA-seq data
 
-This project derives from a Master Thesis analysing the Transcriptome from the hybrid whiptail lizard species A. neomexicanus and its parental species A. arizonae and A. marmoratus.
+###### ================================================================================
+###### OVERVIEW
++ 1. [ This Repository ](#rep)
++ 2. [ Hardware and Operating System ](#OS)
++ 3. [ Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data ](#guide)
+    * 3.1 [ Basecalling & Preprocessing ](#prepros)
+    * 3.2 [ Master Thesis Pipeline (ms-pipeline) ](#ms-pipeline)
+    * 3.3 [ Additional Annoation with BLAST ](#addanno)
++ 4. [ Some file formats explained ](#file-formats)
++ 5. [ Some extra commands ](#extra)
++ 6. [ Abbreviations ](#abbrev)
+###### ================================================================================
 
-Summarized this repository is a guide for Transcriptome Assembly and Annotation using Nanopore direct RNA sequencing data.
+<a name="rep"></a>
+## 1. This Repository
+This repository provides a step-by-step guide for assembling and annotating a transcriptome from Oxford Nanopore direct RNA sequencing (dRNA-seq) data using a reference genome. It includes initial quality checks and lays the foundation for reproducible analyses across different tissues and species.
 
+This guide is separated into 3 Parts:
+1. Basecalling & Preprocessing of the Raw Sequencing Data
+2. ms-pipeline: Transcriptome Assembly & Fucntional Assessment
+3. Additional Annotation via BLAST/UniProt
 
+<a name="OS"></a>
+## 2. Hardware and Operating System 
+All steps except dorado basecalling were successfully executed on Linux-based systems with a x86_64 architecture.
 
+Dorado basecalling was executed on Linux-based systems (x86_64) equipped either with NVIDIA RTX 6000 Ada Generation or NVIDIA Tesla V100-DGXS-32GB GPUs.
 
-## Add your files
+<a name="guide"></a>
+## 3. Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+<a name="prepros"></a>
+## 3.1. Basecalling & Preprocessing
+Basecalling and Preprocessing can be acomplished in different approaches. The one chosen for this approach is described in detail in [README_basecalling_and_preprocessing.md](README_basecalling_and_preprocessing.md).
+
+<a name="nanotome"></a>
+## 3.2. ms-pipeline (Master Thesis Pipeline)
+
+The ms-pipeline is designed to assemble transcriptomes from Oxford Nanopore Technologies (ONT) direct RNA sequencing (dRNA-seq) data, using a reference genome as a guide.
+
+It combines steps for reconstructing the transcriptome (stringtie2), evaluating its completeness with BUSCO Vertebrata, predicting Open Reading Frames (TransDecoder) and performing functional annotation with eggNOG. By this, the workflow provides a reproducible and user-friendly solution that saves time for assessing the quality and completeness of the assembled Transcriptome from dRNA-seq data for further downstream analyses.
+
+The ms-pipeline originates from a Master Thesis project studying hybridization effects in the parthenogenetic species *Aspidoscelis (A.) neomexicanus* and its sexual parental species, *A. marmoratus* and *A. arizonae*. Since assembling a single transcriptome involves more than one time-consuming step, the aim was to combine and automate most of the process for efficient analysis of multiple tissue samples and species. The pipeline enables quicker and standardized transcriptome assembly and its fucntional assessment, preparing the data for subsequent analyses.
+
+<a name="pipe_install"></a>
+#### 4.2.1 Installation Requirements
+These tools are needed to set up the environment and run the pipeline.
+
+- **[nextflow](https://www.nextflow.io/docs/latest/install.html)**: Workflow manager to run the analysis pipeline in a reproducible way.
+- **[docker](https://docs.docker.com/engine/install/ubuntu/)**: Allows to run software in containers. Required for using the provided Docker Image.
+
+**Download files from this repository:**
+To run the pipline please download the following directory structure and files form this repository:
+```
+.
+└──  RESULTS
+│   ├── main.nf
+│   ├── nextflow.config
+│   ├── bin
+│       └── ... (will hold the downloaded databses for busco & eggNOG)
+│   ├── python_scripts
+│       ├── plot_compare_total_number_of_transcripts.py
+│       ├── plot_compare_isoform_per_gene.py
+│       └── plot_orf_categories.py
+```
+
+**Download and prepare necessary databases for the pipeline:**
+The databases only need to be downloaded if these steps want to be executed with the workflow.
+
+- **EggNOG** (~13G & ~9G & ~7G)
+```
+eggnog link to database:
+http://eggnog5.embl.de/download/emapperdb-5.0.2/
+
+#download the databases into the 'bin' folder
+cd bin/
+
+wget http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.db.gz
+gunzip eggnog.db
+
+wget http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog_proteins.dmnd.gz
+gunzip eggnog_proteins.dmnd
+
+wget http://eggnog5.embl.de/download/emapperdb-5.0.2/eggnog.taxa.tar.gz
+tar –xvzf eggnog.taxa.tar.gz
+```
+- **BUSCO** (~ 529M)
+```
+busco link to vertebrata odb10 database
+https://busco-data.ezlab.org/v5/data/lineages/vertebrata_odb10.2024-01-08.tar.gz
+
+#download the databases into the 'bin' folder
+cd bin/
+
+wget https://busco-data.ezlab.org/v5/data/lineages/vertebrata_odb10.2024-01-08.tar.gz
+tar -xzf vertebrata_odb10.2024-01-08.tar.gz
+```
+
+<a name="pipe_run"></a>
+#### 3.2.2 Run the ms-pipeline
+The nextflow pipeline runs on a Docker image by default.
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.rlp.net/anzenker/master_thesis_anzenker_2025.git
-git branch -M main
-git push -uf origin main
+# help message
+nextflow run main.nf -help
+
+#run
+nextflow run main.nf --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS
 ```
 
-## Integrate with your tools
+*Optional parameters 
+- --outdir NAME     (defines the anme of the output directory) 
+- --color HEX_CODE  (defines the plot color for the output plots, requires a hex color code e.g. #688e26)
+- --skip_eggnog true  (runs the workflow without eggNOG annotation)
+- --skip_busco true   (runs the workflow without busco analysis)
+- --skip_orf          (runs the workflow without orf prediction and without eggNOG annotation)
+- --no_plots          (no outout plots are generated from the workflow)
+*
 
-- [ ] [Set up project integrations](https://gitlab.rlp.net/anzenker/master_thesis_anzenker_2025/-/settings/integrations)
+<a name="pipe_dir"></a>
+#### 4.2.3 ms-pipeline results directory
+```
+.
+└──  RESULTS
+│   ├── 1_minimap2_output
+│       └── ...
+│   ├── 2_stringtie2_transcriptome
+│       └── ...
+│   ├── 3_gffread_transcriptome
+│       └── ...
+│   ├── 4_canonical_transcriptome
+│       └── ...
+│   ├── 5_frame_selection
+│       └── ...
+│   ├── 6_busco_vertebrata_completeness
+│       ├── busco_output_xxx_transcripts
+│           └── ...
+│       ├── busco_output_xxx_transcripts_caninical
+│           └── ...
+│   ├── 7_eggnog_annotation
+│           └── ...
+│   ├── 8_plots
+│           └── ...
+```
+<a name="manual"></a>
+#### 3.2.4 Code implemented into the nanoTome pipeline
+All code implemented into the pipeline can be found in [README_commands_implemented_in_pipeline.md](README_commands_implemented_in_pipeline.md) for manual execution.
 
-## Collaborate with your team
+<a name="addanno"></a>
+## 4.3. Additional Annotation
+To generate a broader functional annotation of the Transcriptome.
+<a name="up"></a>
+### 4.3.1 UniProt annotation 
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+### Download and make database locally
+```
+UniProt link to database:
+https://www.uniprot.org/help/downloads
 
-## Test and Deploy
+#download the databases into the 'bin' folder
+cd bin/
 
-Use the built-in continuous integration in GitLab.
+# download database
+wget https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+# unzip downloaded fasta file
+gzip -d uniprot_sprot.fasta.gz
 
-***
+# create blast database from fasta file (~310M)
+makeblastdb -in bin/uniprot_sprot.fasta -dbtype prot
 
-# Editing this README
+```
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+### Run the annotation
+```
+# blast search of transcripts against UniProt database
+# choose max_target_seq 1 to only receive the top hit
 
-## Suggestions for a good README
+blastp -query transdecoder_dir/longest_orfs.pep  \
+    -db uniprot_sprot.fasta  -max_target_seqs 1 \
+    -outfmt 6 -evalue 1e-5 -num_threads 10 > blastp.outfmt6
+```
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+<a name="file-formats"></a>
+## 5. Some file formats explained
+Some file formats used to analyse the data are explained in  [`README_file_formats.md`](README_file_formats.md).
 
-## Name
-Choose a self-explaining name for your project.
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+<a name="extra"></a>
+## 6. Some extra commands
+Command to check the amount of bases in the .fasta or .fastq files:
+```
+seqkit stats *.fasta
+```
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+<a name="abbrev"></a>
+## 7. Abbreviations
+- ONT   Oxford Nanopore
+- QC    Quality Control
+- mRNA  messenger RNA
