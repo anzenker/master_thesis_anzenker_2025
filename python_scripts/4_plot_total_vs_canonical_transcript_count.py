@@ -1,0 +1,140 @@
+#!/usr/bin/env python3
+import argparse, textwrap, os, gzip
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# ---------- helpers ----------
+
+SPECIES_COLORS = {
+    "A. marmoratus":  "#b99666",
+    "A. arizonae":    "#1469A7",
+    "A. neomexicanus":"#688e26",
+}
+
+def count_fasta_headers(path: str) -> int:
+    """Count sequences by '>' header, supports .gz or plain."""
+    opn = gzip.open if path.endswith(".gz") else open
+    with opn(path, "rt") as fh:
+        return sum(1 for line in fh if line.startswith(">"))
+
+def summarize_species_counts(species: str, fasta: str, canonical_fasta: str) -> pd.DataFrame:
+    """Return 2-row dataframe for a single species: Total & Canonical counts."""
+    total_transcripts = count_fasta_headers(fasta)
+    total_canonical   = count_fasta_headers(canonical_fasta)
+
+    df = pd.DataFrame(
+        [
+            ["Total Count Transcripts", total_transcripts, species],
+            ["Total Count Canonical",   total_canonical,   species],
+        ],
+        columns=["Total", "Count", "Species"]
+    )
+    return df
+
+def default_color_for(species: str) -> str:
+    return SPECIES_COLORS.get(species.strip(), "#C79FEF")
+
+# ---------- plotting ----------
+
+def plot_transcript_counts(df: pd.DataFrame, out_png: str, color_map: dict):
+    # order species as they appear
+    species_order = list(dict.fromkeys(df["Species"].tolist()))
+
+    df["Total"] = pd.Categorical(
+        df["Total"],
+        categories=["Total Count Transcripts", "Total Count Canonical"],
+        ordered=True
+    )
+    df["Species"] = pd.Categorical(df["Species"], categories=species_order, ordered=True)
+
+    pivot_df = df.pivot(index="Total", columns="Species", values="Count").fillna(0).astype(int)
+    colors = [color_map.get(sp, default_color_for(sp)) for sp in pivot_df.columns]
+
+    ax = pivot_df.plot(kind="bar", width=0.75, edgecolor="white", color=colors, figsize=(9, 6))
+    ax.set_ylabel("Count of Transcripts")
+    ax.set_xlabel("")
+    ax.set_title("Total vs Canonical Transcript Counts per Species")
+    plt.xticks(rotation=0)
+    ax.legend(title="Species", frameon=False)
+
+    # annotate bars
+    ymax = pivot_df.max().max() * 1.10
+    ax.set_ylim(0, ymax)
+    for container in ax.containers:
+        for bar in container:
+            h = bar.get_height()
+            if h > 0:
+                ax.text(bar.get_x() + bar.get_width()/2, h,
+                        f"{int(h)}",
+                        ha="center", va="bottom", fontsize=9, xytext=(0,3),
+                        textcoords="offset points")
+
+    plt.tight_layout()
+    plt.savefig(out_png, dpi=300)
+    plt.close()
+    print(f"Saved plot: {out_png}")
+
+# ---------- CLI ----------
+
+def main():
+    p = argparse.ArgumentParser(
+        description=textwrap.dedent("""\
+            Plot total vs canonical transcript counts for 1–3 species.
+            Species names are optional; fallback lilac color used if unknown.
+        """),
+        formatter_class=argparse.RawTextHelpFormatter
+    )
+
+    # species 1 (required FASTA, optional name)
+    p.add_argument("fasta1", help="Transcriptome FASTA (species 1)")
+    p.add_argument("canonical1", help="Canonical transcript FASTA (species 1)")
+    p.add_argument("--species1", default=None, help="Species name 1 (optional)")
+    p.add_argument("--color1", default=None, help="Hex color for species 1 (optional)")
+
+    # species 2 (optional)
+    p.add_argument("--fasta2", default=None, help="Transcriptome FASTA (species 2)")
+    p.add_argument("--canonical2", default=None, help="Canonical transcript FASTA (species 2)")
+    p.add_argument("--species2", default=None, help="Species name 2 (optional)")
+    p.add_argument("--color2", default=None, help="Hex color for species 2 (optional)")
+
+    # species 3 (optional)
+    p.add_argument("--fasta3", default=None, help="Transcriptome FASTA (species 3)")
+    p.add_argument("--canonical3", default=None, help="Canonical transcript FASTA (species 3)")
+    p.add_argument("--species3", default=None, help="Species name 3 (optional)")
+    p.add_argument("--color3", default=None, help="Hex color for species 3 (optional)")
+
+    p.add_argument("--out-prefix", default="transcript_counts", help="Output prefix for files")
+    args = p.parse_args()
+
+    jobs, color_map = [], {}
+
+    # s1
+    sp1 = args.species1 or "Species1"
+    jobs.append((sp1, args.fasta1, args.canonical1))
+    color_map[sp1] = args.color1 or default_color_for(sp1)
+
+    # s2
+    if args.fasta2 and args.canonical2:
+        sp2 = args.species2 or "Species2"
+        jobs.append((sp2, args.fasta2, args.canonical2))
+        color_map[sp2] = args.color2 or default_color_for(sp2)
+
+    # s3
+    if args.fasta3 and args.canonical3:
+        sp3 = args.species3 or "Species3"
+        jobs.append((sp3, args.fasta3, args.canonical3))
+        color_map[sp3] = args.color3 or default_color_for(sp3)
+
+    # build one DF
+    frames = [summarize_species_counts(sp, fa, can) for sp, fa, can in jobs]
+    df = pd.concat(frames, ignore_index=True)
+
+    counts_csv = f"{args.out_prefix}_counts.csv"
+    df.to_csv(counts_csv, index=False)
+    print(f"Saved table: {counts_csv}")
+
+    out_png = f"{args.out_prefix}_grouped_bar.png"
+    plot_transcript_counts(df, out_png, color_map)
+
+if __name__ == "__main__":
+    main()
