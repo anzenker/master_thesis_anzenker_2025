@@ -50,25 +50,36 @@ def plot_transcript_counts(df: pd.DataFrame, out_png: str, color_map: dict):
     pivot_df = df.pivot(index="Total", columns="Species", values="Count").fillna(0).astype(int)
     colors = [color_map.get(sp, default_color_for(sp)) for sp in pivot_df.columns]
 
-    ax = pivot_df.plot(kind="bar", width=0.75, edgecolor="white", color=colors, figsize=(9, 6))
+    ax = pivot_df.plot(kind="bar", width=0.5, edgecolor="white", color=colors, figsize=(9, 6))
     ax.set_ylabel("Count of Transcripts")
     ax.set_xlabel("")
     ax.set_title("Total vs Canonical Transcript Counts per Species")
     plt.xticks(rotation=0)
     ax.legend(title="Species", frameon=False)
 
+    species = list(pivot_df.columns)          # columns = species
+    cats     = list(pivot_df.index)           # rows = categories
+    totals_by_species = pivot_df.loc["Total Count Transcripts"].to_dict()  # {species: total}
+
+    
     # annotate bars
     ymax = pivot_df.max().max() * 1.10
     ax.set_ylim(0, ymax)
-    for container in ax.containers:
-        for bar in container:
-            h = bar.get_height()
-            if h > 0:
-                ax.text(bar.get_x() + bar.get_width()/2, h,
-                        f"{int(h)}",
-                        ha="center", va="bottom", fontsize=9, xytext=(0,3),
-                        textcoords="offset points")
+    for col_idx, container in enumerate(ax.containers):
+        sp = species[col_idx]
+        denom = float(totals_by_species.get(sp, 0)) or 1.0  # avoid div-by-zero
 
+        for j, bar in enumerate(container):                 # j = category index
+            count = bar.get_height()
+            # Percent of that species' total transcripts
+            pct = 100.0 * count / denom if denom else 0.0
+
+            ax.text(
+                bar.get_x() + bar.get_width()/2,
+                count + ymax*0.01,
+                f"{pct:.1f}%\n{int(count)}",
+                ha="center", va="bottom", fontsize=9
+        )
     plt.tight_layout()
     plt.savefig(out_png, dpi=300)
     plt.close()
