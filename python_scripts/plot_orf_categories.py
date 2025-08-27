@@ -1,130 +1,171 @@
 from collections import defaultdict, Counter
 from Bio import SeqIO
 import matplotlib.pyplot as plt
-import argparse
-import textwrap
 from matplotlib import colors as mcolors
+import argparse, textwrap, os
+import pandas as pd
 
-def parse_input_files(input_fasta, input_pep):
-    total_no_transcripts = len([1 for line in open(input_fasta) if line.startswith(">")])
+def parse_one_species(fasta_path: str, pep_path: str):
+    """
+    Returns:
+      total_transcripts, with_orf_count, orf_type_counter
+      where orf_type_counter maps:
+        {'complete', '5prime_partial', '3prime_partial', 'internal'} -> counts
+    """
+    total_transcripts = sum(1 for line in open(fasta_path) if line.startswith(">"))
 
+    # collect all ORFs per transcript base id
     orf_dict = defaultdict(list)
-    orf_type_counter = Counter()
-
-    # Parse .pep file and group by transcript base ID
-    for record in SeqIO.parse(input_pep, "fasta"):
-        desc_parts = record.description.split()
+    for rec in SeqIO.parse(pep_path, "fasta"):
+        # TransDecoder description has 'type:<complete|5prime_partial|3prime_partial|internal>'
         orf_type = "unknown"
-        for part in desc_parts:
+        for part in rec.description.split():
             if part.startswith("type:"):
-                orf_type = part.split(":")[1]
+                orf_type = part.split(":", 1)[1]
                 break
-        transcript_id = record.id.rsplit(".", 1)[0]  # AC73_xxx.p1/p2 → AC73_xxx
-        seq_length = len(record.seq)
-        # save for each transcript id the each detected type of ORF with their length
-        orf_dict[transcript_id].append((orf_type, seq_length))
+        base_tid = rec.id.rsplit(".", 1)[0]  # AC73_xxx.p1 -> AC73_xxx
+        orf_dict[base_tid].append((orf_type, len(rec.seq)))
 
-    # only choose one ORF per transcript id --> complete & longest
-    max_orfs = {}
+    # keep the longest ORF per transcript & count types
+    longest_orf_per_tx = {}
+    orf_type_counter = Counter()
+    for tid, orfs in orf_dict.items():
+        best = max(orfs, key=lambda x: x[1])     # choose longest
+        longest_orf_per_tx[tid] = best
+        orf_type_counter[best[0]] += 1
 
-    for transcript_id, orfs in orf_dict.items():
-        # Choose the longest ORF regardless of type
-        best_orf = max(orfs, key=lambda x: x[1])  # x[1] is the length
-        max_orfs[transcript_id] = best_orf
-        orf_type_counter[best_orf[0]] += 1
+    with_orf_count = len(longest_orf_per_tx)
+    return total_transcripts, with_orf_count, orf_type_counter
 
-    return total_no_transcripts, best_orf, max_orfs, orf_type_counter, orf_dict
+def summarize_species_row(species: str, fasta: str, pep: str):
+    total, with_orf, c = parse_one_species(fasta, pep)
+    # Normalize TransDecoder keys -> compact column names
+    row = {
+        "species": species,
+        "with_orf": with_orf,
+        "complete":        c.get("complete", 0),
+        "5partial":        c.get("5prime_partial", 0),
+        "3partial":        c.get("3prime_partial", 0),
+        "internal":        c.get("internal", 0),
+        "total_transcripts": total
+    }
+    return row
 
-def plot_orf_distribution(total_no_transcripts, best_orf, max_orfs, orf_dict, plot_color):
-    # Compute transcript counts
-    transcripts_with_orf = set(max_orfs.keys())
-    total_with_orf = len(transcripts_with_orf)
-    single_orf = sum(1 for orfs in orf_dict.values() if len(orfs) == 1)
-    multi_orf = sum(1 for orfs in orf_dict.values() if len(orfs) > 1)
+# ---------- plotting ----------
 
-    # Adjust based on your transcriptome
-    total_transcripts = total_no_transcripts  # ← update this to actual total transcript number
-    total_with_orf = len(max_orfs)
-    transcripts_without_orf = total_transcripts - total_with_orf
+def plot_grouped_from_pivot(pivot_df: pd.DataFrame, colors_map: dict, out_png: str):
+    """
+    pivot_df:   index = category ('with_orf','complete','5partial','3partial','internal')
+                columns = species
+                values = counts
+    """
+    # order categories sensibly
+    order = ["total_transcripts", "with_orf", "complete", "5partial", "3partial", "internal"]
+    order = [c for c in order if c in pivot_df.index]
+    pivot_df = pivot_df.loc[order]
 
-    categories = [
-        "Count Transcriptome (T)",
-        "Count T. with ORF",
-        "Count T. without ORF",
-        "Count T. with 1 ORF",
-        "Count T. with > 1 ORF"
-    ]
+    # colors in column order
+    bar_colors = [colors_map.get(sp, "#888888") for sp in pivot_df.columns]
 
-    counts = [
-        total_transcripts,
-        total_with_orf,
-        transcripts_without_orf,
-        single_orf,
-        multi_orf,
-    ]
+    ax = pivot_df.T.plot(kind="bar", color=None, figsize=(8, 5))  # bars grouped by category for each species
+    # we want categories on x-axis; above transposed, so revert:
+    plt.clf()
+    ax = pivot_df.plot(kind="bar", figsize=(9,5), width=0.5, color=bar_colors, edgecolor='white')
 
-    colors = [plot_color] * 5
-
-    percentages = [f"{(c/total_transcripts)*100:.1f}%" for c in counts]
-    numbers = [f"{total_transcripts}" for c in counts]
-    # Combine number and percentage labels
-    labels = [f"{count}\n({percent})" for count, percent in zip(counts, percentages)]
+    ax.set_ylabel("Count")
+    ax.set_xlabel("Categories")
+    ax.set_title("ORF categories per species")
+    ax.legend(title="Species", frameon=False)
 
 
-    # Plot
-    fig, ax = plt.subplots(figsize=(12, 6))
-    bars = ax.bar(categories, counts, color=colors)
+    totals = pivot_df.loc["total_transcripts"]  # Series: per-species totals
 
-    # Add labels above each bar
-    for bar, label in zip(bars, labels):
-        height = bar.get_height()
-        ax.text(
-            bar.get_x() + bar.get_width() / 2.,
-            height,
-            label,
-            ha='center',
-            va='bottom',
-            fontsize=10
-        )
+    # annotate bars with counts
+    ymax = pivot_df.max().max() * 1.10
+    ax.set_ylim(0, ymax)
+    for col_idx, container in enumerate(ax.containers):
+        for bar in container:
+            h = bar.get_height()
+            if h > 0:
+                ax.text(bar.get_x() + bar.get_width()/2, h + ymax*0.01,
+                        f"{round((int(h) / totals[col_idx]) * 100), 2}% \n {int(h)}",
+                        ha="center", va="bottom", fontsize=9)
 
-    # Axis labels and formatting
-    ax.set_ylabel("Number of Transcripts / ORFs")
-    ax.set_title("Transcript and ORF Statistics")
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=0)
     plt.tight_layout()
-    plt.savefig("orf_prediction_categories.png")
-
-def plot_pie_chart_orf_categories(orf_type_counter, plot_color):
-
-    # Prepare counts and labels
-    categories = [
-        "Complete ORF",
-        "5' Partial ORF",
-        "3' Partial ORF",
-        "Internal ORF"
-    ]
-    counts = [
-        orf_type_counter.get("complete", 0),
-        orf_type_counter.get("5prime_partial", 0),
-        orf_type_counter.get("3prime_partial", 0),
-        orf_type_counter.get("internal", 0)
-    ]
-
-    colors = generate_shades(plot_color, 4)
-
-
-    fig, ax = plt.subplots()
-    ax.pie(counts, labels=categories, colors=colors, autopct='%1.1f%%', startangle=180, labeldistance=1.1, pctdistance=.9)
-    ax.set_title("ORF Type Distribution")
-    plt.tight_layout()
-    plt.show()
-    plt.savefig("pie_chart_orf_categories.png")
+    plt.savefig(out_png, dpi=300)
     plt.close()
 
-def generate_shades(base_color, n):
-    base_rgb = mcolors.to_rgb(base_color)
-    shades = [tuple(min(1, c + i*0.15) for c in base_rgb) for i in range(n)]
-    return shades
+def default_color_for(species: str) -> str:
+    # override here for your 3 common species
+    if species.strip() == "A. marmoratus":  return "#b99666"
+    if species.strip() == "A. arizonae":    return "#1469A7"
+    if species.strip() == "A. neomexicanus":return "#688e26"
+    return "#C79FEF"  # fallback
+
+def main():
+
+    # collect jobs (only include fully specified species)
+    jobs = []
+    species_order = []
+    
+    # species1
+    species_order.append(args.species_name1)
+    jobs.append( (args.species_name1, args.input_fasta1, args.input_pep1, args.plot_color1 or default_color_for(args.species_name1)) )
+
+    #species 2 
+    if args.input_fasta2 and args.input_pep2 and args.species_name2:
+        jobs.append( (args.species_name2, args.input_fasta2, args.input_pep2, args.plot_color2 or default_color_for(args.species_name2)) )
+        sp_name = args.species_name2 or os.path.basename(args.input_fasta2).split("_")[0]
+        species_order.append(sp_name)
+
+    # species 3
+    if args.input_fasta3 and args.input_pep3 and args.species_name3:
+        jobs.append( (args.species_name3, args.input_fasta3, args.input_pep3, args.plot_color3 or default_color_for(args.species_name3)) )
+        sp_name = args.species_name3 or os.path.basename(args.input_fasta3).split("_")[0]
+        species_order.append(sp_name)
+
+    # summarize each species
+    rows = []
+    color_map = {}
+    for sp, fa, pep, col in jobs:
+        rows.append(summarize_species_row(sp, fa, pep))
+        color_map[sp] = col
+
+    # tidy table (one row per species with columns = categories)
+    wide_df = pd.DataFrame(rows)
+    # build tidy long form for saving/inspection if you like
+    long_df = wide_df.melt(
+        id_vars=["species"],
+        value_vars=["total_transcripts", "with_orf", "complete", "5partial", "3partial", "internal"],
+        var_name="category",
+        value_name="count"
+    )
+
+    # pivot: rows = category, columns = species, values = count
+    pivot = long_df.pivot(index="category", columns="species", values="count").fillna(0).astype(int)
+    pivot = pivot[species_order]
+    
+    percent_pivot = pivot.divide(pivot.loc["total_transcripts"], axis=1) * 100
+    percent_pivot.loc["total_transcripts"] = 100.0
+    percent_pivot = percent_pivot.round(2)
+
+
+    # save tables
+    out_pivot_csv = f"{args.out_prefix}_pivot.csv"
+    out_long_csv  = f"{args.out_prefix}_long.csv"
+    pivot.to_csv(out_pivot_csv)
+    long_df.to_csv(out_long_csv, index=False)
+
+    # plot grouped bars from pivot
+    out_png = f"{args.out_prefix}_grouped_bar.png"
+    plot_grouped_from_pivot(pivot, color_map, out_png)
+
+    print("=== Pivot table (categories x specie(s)) ===")
+    print(pivot)
+    print(percent_pivot)
+    print(f"\nSaved: {out_pivot_csv}, {out_long_csv}, {out_png}")
+
 
 if __name__ == "__main__":
     # script description
@@ -134,16 +175,61 @@ if __name__ == "__main__":
         formatter_class=argparse.RawTextHelpFormatter)
     
     # input files given by user 
-    parser.add_argument("-input_fasta", help="Path to Transcriptome FASTA file")
-    parser.add_argument("-input_pep", help="Path to TransDecoder PEP file")
-    parser.add_argument("-plot_color", default="#C79FEF", help="Color for plotting in hex code, default = lilac (#C79FEF)")
+    # required species
+    parser.add_argument("input_fasta1", help="Path to Transcriptome FASTA file")
+    parser.add_argument("input_pep1", help="Path to TransDecoder PEP file")
+    parser.add_argument("species_name1", help="Name of the species")
+    #the following are optional user inputs
+    parser.add_argument("-plot_color1", default=None, help="Color for plotting in hex code")
+    # optional species 2
+    parser.add_argument("-input_fasta2", default=None, help="Path to Transcriptome FASTA file")
+    parser.add_argument("-input_pep2", default=None, help="Path to TransDecoder PEP file")
+    parser.add_argument("-species_name2", default=None, help="Name of the species")
+    parser.add_argument("-plot_color2", default=None, help="Color for plotting in hex code, default") 
+    # optional species 3
+    parser.add_argument("-input_fasta3", default=None, help="Path to Transcriptome FASTA file")
+    parser.add_argument("-input_pep3", default=None, help="Path to TransDecoder PEP file")
+    parser.add_argument("-species_name3", default=None, help="Name of the species")
+    parser.add_argument("-plot_color3", default=None, help="Color for plotting in hex code, default")  
+    #optional file prefix
+    parser.add_argument("--out-prefix", default="orf_compare") 
+
     args = parser.parse_args()
 
-    plot_color = args.plot_color if args.plot_color is not None else  "#C79FEF"
-    # run plotting
-    total_no_transcripts, best_orf, max_orfs, orf_type_counter, orf_dict = parse_input_files(args.input_fasta, args.input_pep)
+    if args.plot_color1 is not None:
+        plot_color1 = args.plot_color1
+    elif args.species_name1 == "A. marmoratus":
+        plot_color1 = "#b99666"
+    elif args.species_name1 == "A. arizonae":
+        plot_color1 = "#1469A7"      
+    elif args.species_name1 == "A. neomexicanus":
+        plot_color1 = "#688e26"
+    else:
+        plot_color1 = "#C79FEF"
+    
+    if args.input_fasta2 is not None:
+        if args.plot_color2 is not None:
+            plot_color2 = args.plot_color2
+        elif args.species_name2 == "A. marmoratus":
+            plot_color2 = "#b99666"
+        elif args.species_name2 == "A. arizonae":
+            plot_color2 = "#1469A7"      
+        elif args.species_name2 == "A. neomexicanus":
+            plot_color2 = "#688e26"
+        else:
+            plot_color2 = "#C79FEF"
+    
+    if args.input_fasta3 is not None:
+        if args.plot_color3 is not None:
+            plot_color3 = args.plot_color3
+        elif args.species_name3 == "A. marmoratus":
+            plot_color3 = "#b99666"
+        elif args.species_name3 == "A. arizonae":
+            plot_color3 = "#1469A7"      
+        elif args.species_name3 == "A. neomexicanus":
+            plot_color3 = "#688e26"
+        else:
+            plot_color3 = "#C79FEF"
 
-    #best_orf not yet used 
 
-    plot_orf_distribution(total_no_transcripts, best_orf, max_orfs, orf_dict, plot_color)
-    plot_pie_chart_orf_categories(orf_type_counter, plot_color)
+    main()
