@@ -271,7 +271,7 @@ process plotIsoformPerGene {
     # make output dir expected by your script
     mkdir -p 2_ipg
     
-    python $python_script $gtf_input_file 2_ipg -plot_color1 "$color"
+    python $python_script $gtf_input_file 2_ipg -plot_color "$color"
     """
 }
 
@@ -301,7 +301,7 @@ process plotORFStatistics {
     export XDG_CACHE_HOME="\$PWD/.cache"
     mkdir -p "\$MPLCONFIGDIR" "\$XDG_CACHE_HOME/fontconfig"
 
-    python $python_script $input_fasta $input_pep -plot_color "$plot_color"
+    python $python_script $input_fasta $input_pep -plot_color1 "$plot_color"
     """
 }
 
