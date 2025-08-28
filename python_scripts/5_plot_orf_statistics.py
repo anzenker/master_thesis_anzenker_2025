@@ -80,17 +80,22 @@ def plot_grouped_from_pivot(pivot_df: pd.DataFrame, colors_map: dict, out_png: s
 
     totals = pivot_df.loc["total_transcripts"]  # Series: per-species totals
 
-    # annotate bars with counts
     ymax = pivot_df.max().max() * 1.10
     ax.set_ylim(0, ymax)
-    for col_idx, container in enumerate(ax.containers):
-        for bar in container:
-            h = bar.get_height()
-            if h > 0:
-                ax.text(bar.get_x() + bar.get_width()/2, h + ymax*0.01,
-                        f"{round((int(h) / totals[col_idx]) * 100), 2}% \n {int(h)}",
-                        ha="center", va="bottom", fontsize=9)
 
+    for col_idx, container in enumerate(ax.containers):
+        denom = float(totals.iloc[col_idx]) if len(totals) > col_idx and totals.iloc[col_idx] else 0.0
+        for bar in container:
+            h = float(bar.get_height())
+            if h > 0:
+                pct = (h / denom * 100.0) if denom > 0 else 0.0
+                ax.text(
+                    bar.get_x() + bar.get_width()/2,
+                    h + ymax*0.01,
+                    f"{pct:.1f}%\n{int(h)}",
+                    ha="center", va="bottom", fontsize=9
+                )
+                
     plt.xticks(rotation=0)
     plt.tight_layout()
     plt.savefig(out_png, dpi=300)
@@ -105,30 +110,41 @@ def default_color_for(species: str) -> str:
 
 def main():
 
-    # collect jobs (only include fully specified species)
+        # collect jobs (only include fully specified species)
     jobs = []
     species_order = []
+    color_map = {}
 
-    species_name1 = args.species_name1 if args.species_name1 else "species 1"
-    species_name2 = args.species_name2 if args.species_name2 else "species 2"
-    species_name3 = args.species_name3 if args.species_name3 else "species 3"
-    
-    # species1
-    species_order.append(args.species_name1)
-    jobs.append( (args.species_name1, args.input_fasta1, args.input_pep1, args.plot_color1 or default_color_for(args.species_name1)) )
+    def fallback_label(fasta_path: str, given: str | None, default_stub: str) -> str:
+        if given and given.strip():
+            return given
+        base = os.path.basename(fasta_path)
+        stub = base.split('.')[0] if '.' in base else base
+        return stub or default_stub
 
-    #species 2 
-    if args.input_fasta2 and args.input_pep2 and args.species_name2:
-        jobs.append( (args.species_name2, args.input_fasta2, args.input_pep2, args.plot_color2 or default_color_for(args.species_name2)) )
-        sp_name = args.species_name2 or os.path.basename(args.input_fasta2).split("_")[0]
-        species_order.append(sp_name)
+    # species 1 (required)
+    label1 = fallback_label(args.input_fasta1, args.species_name1, "species_1")
+    col1   = args.plot_color1 or default_color_for(label1)
+    species_order.append(label1)
+    jobs.append((label1, args.input_fasta1, args.input_pep1, col1))
+    color_map[label1] = col1
 
-    # species 3
-    if args.input_fasta3 and args.input_pep3 and args.species_name3:
-        jobs.append( (args.species_name3, args.input_fasta3, args.input_pep3, args.plot_color3 or default_color_for(args.species_name3)) )
-        sp_name = args.species_name3 or os.path.basename(args.input_fasta3).split("_")[0]
-        species_order.append(sp_name)
+    # species 2 (optional – do NOT require a name)
+    if args.input_fasta2 and args.input_pep2:
+        label2 = fallback_label(args.input_fasta2, args.species_name2, "species_2")
+        col2   = args.plot_color2 or default_color_for(label2)
+        species_order.append(label2)
+        jobs.append((label2, args.input_fasta2, args.input_pep2, col2))
+        color_map[label2] = col2
 
+    # species 3 (optional)
+    if args.input_fasta3 and args.input_pep3:
+        label3 = fallback_label(args.input_fasta3, args.species_name3, "species_3")
+        col3   = args.plot_color3 or default_color_for(label3)
+        species_order.append(label3)
+        jobs.append((label3, args.input_fasta3, args.input_pep3, col3))
+        color_map[label3] = col3
+        
     # summarize each species
     rows = []
     color_map = {}
