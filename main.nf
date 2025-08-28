@@ -286,6 +286,10 @@ process plotORFStatistics {
     """
     #!/bin/bash
 
+    # ensure matplotlib uses a writable dir
+    export MPLCONFIGDIR="\$PWD/.mplconfig"
+    mkdir -p \$MPLCONFIGDIR
+
     python $python_script $input_fasta $input_pep -plot_color "$plot_color"
     """
 }
@@ -309,7 +313,11 @@ process plotTotalTranscripts {
     script:
     """
     #!/bin/bash
-    
+
+    # ensure matplotlib uses a writable dir
+    export MPLCONFIGDIR="\$PWD/.mplconfig"
+    mkdir -p \$MPLCONFIGDIR
+
     python $python_script $input_fasta_1 $input_fasta_2 --color1 $plot_color
     """ 
 }
@@ -336,7 +344,11 @@ process plotOverviewQuality {
     script:
     """
     #!/bin/bash
-    
+
+    # ensure matplotlib uses a writable dir
+    export MPLCONFIGDIR="\$PWD/.mplconfig"
+    mkdir -p \$MPLCONFIGDIR
+
     python $python_script $input_gtf $input_fasta $input_pep $input_busco $input_eggnog overview_quality --species_name $species_name
     """ 
 }
