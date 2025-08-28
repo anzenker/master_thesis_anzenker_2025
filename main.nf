@@ -526,8 +526,8 @@ workflow {
         //***************************************
         //6. BUSCO Vertebrate - Completeness Assessment
         //***************************************
-        params.busco_d_path = "${launchDir}/bin/busco_downloads/"
-        //def busco_downloads_path = file("${launchDir}/bin/busco_downloads/lineages/vertebrata_odb10/")
+        //params.busco_d_path = "${launchDir}/bin/busco_downloads/"
+        def busco_downloads_path = file("${launchDir}/bin/busco_downloads/")
         params.python_file_4 = "${projectDir}/python_scripts/6_busco_completeness_stacked_barplot.py"
         //def python_script_path_4 = file("${projectDir}/python_scripts/6_busco_completeness_stacked_barplot.py")
 
@@ -538,7 +538,7 @@ workflow {
         // channel of (path,label) items
         def transcriptome_labeled = total_ch.mix(canonical_ch)
 
-        buscoVertebrataCompleteness(params.threads, transcriptome_labeled, params.busco_d_path)
+        buscoVertebrataCompleteness(params.threads, transcriptome_labeled, busco_downloads_path)
 
         plotBUSCOCompleteness(params.python_file_4, buscoVertebrataCompleteness.out,   // tuple: (busco_full_table_<label>.tsv, label)
                                 params.species_name ?: 'Species'
@@ -550,9 +550,9 @@ workflow {
             //***************************************
             //7. EggNOG Annotation
             //***************************************
-            params.eggnog_db = "${launchDir}/bin/"
-            //def eggnog_databases_path = file("${launchDir}/bin/")
-            eggnogAnnotation(transDecoderORF.out, params.threads, params.eggnog_db) //.pep, threads no., path --> .hits, .annotation, .seed_orthologs
+            //params.eggnog_db = "${launchDir}/bin/"
+            def eggnog_db_path = file("${launchDir}/bin/")
+            eggnogAnnotation(transDecoderORF.out, params.threads, eggnog_db_path) //.pep, threads no., path --> .hits, .annotation, .seed_orthologs
 
         } 
 
