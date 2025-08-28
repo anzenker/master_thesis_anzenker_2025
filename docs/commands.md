@@ -2,7 +2,7 @@
 
 ###### ================================================================================
 ###### OVERVIEW
-+ 1. [Preprocessing](#prepro)
+* **1. [Preprocessing](#prepro)**
     * 1.1. [ dorado basecalling ](#dorado)
     * 1.2. [ ubam to fastq ](#file_format)
     * 1.3. [ Filtering RNA CS Control Sequences ](#rna_cs)
@@ -12,7 +12,7 @@
     * 1.7. [ poly(A) tail trimming](#polya)
     * 1.8. [ Repetitive Pattern Detection ](#rep_pat)
 
-+ 2. [Nextflow Pipeline - Implemented Tool Commands](#ms_pipe)
+* **2. [Nextflow Pipeline - Implemented Tool Commands](#ms_pipe)**
     * 2.1. [ minimap2 & samtools - Mapping the raw reads to the reference genome ](#minimap2)
     * 2.2. [ stringtie2 - Reference-guided Transcriptome Assembly ](#stringtie2)
     * 2.3. [ gffread - Reading the transcript sequences from the Reference Genome  ](#gffread)
