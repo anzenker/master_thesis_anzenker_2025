@@ -254,6 +254,9 @@ process plotIsoformPerGene {
     script:
     """
     #!/bin/bash
+    # ensure matplotlib uses a writable dir
+    export MPLCONFIGDIR="\$PWD/.mplconfig"
+    mkdir -p \$MPLCONFIGDIR
     
     python $python_script $gtf_input_file 2_ipg -plot_color "$color"
     """
