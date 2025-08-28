@@ -535,7 +535,7 @@ workflow {
         transDecoderORF.out,          // PEP
         buscoVertebrataCompleteness.out, // full_table.tsv
         eggnogAnnotation.out,         // .annotations
-        species_name
+        params.species_name
         )
     }
     //----------------------------------------
