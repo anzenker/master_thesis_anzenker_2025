@@ -432,7 +432,19 @@ workflow {
     if (!params.genome){
         exit 1, "Missing parameter: --genome"
     }
-
+    if params.skip_eggnog {
+        println("EggNOG annotation will be skipped.")
+    }
+    if params.skip_busco {
+        println("BUSCO analysis will be skipped.")
+    }
+    if params.skip_orf {
+        println("ORF Prediction and EggNOG annotation will be skipped.")
+    }
+    if params.no_plots {
+        println("No plots will be generated.")
+    }
+   
     // pipeline run info
     log.info "==========PIPELINE START=========="
     def summary = [:]
