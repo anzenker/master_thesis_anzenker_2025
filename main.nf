@@ -161,9 +161,9 @@ process eggnogAnnotation {
     path eggDB_path
 
     output:
-    path "eggnog_${input_orf_pep.baseName}.emapper.hits"
-    path "eggnog_${input_orf_pep.baseName}.emapper.seed_orthologs"
-    path "eggnog_${input_orf_pep.baseName}.emapper.annotations"
+    path "eggnog_${input_orf_pep.baseName}.emapper.hits", emit: hits
+    path "eggnog_${input_orf_pep.baseName}.emapper.seed_orthologs", emit: seeds
+    path "eggnog_${input_orf_pep.baseName}.emapper.annotations", emit: anno
 
     script:
     """
@@ -534,9 +534,10 @@ workflow {
         gffreadToFasta.out,           // FASTA
         transDecoderORF.out,          // PEP
         buscoVertebrataCompleteness.out, // full_table.tsv
-        eggnogAnnotation.out,         // .annotations
+        eggnogAnnotation.out.hits,         // .annotations
         params.species_name
         )
+
     }
     //----------------------------------------
     workflow.onComplete {
