@@ -433,16 +433,6 @@ workflow {
         exit 1, "Missing parameter: --genome"
     }
 
-    // check input file paths 
-    Channel.fromPath(params.raw_reads, checkIfExists: true)
-            .ifEmpty {
-                exit 1, "File ${params.raw_reads} cannot be found.}"
-            }
-    Channel.fromPath(params.genome, checkIfExists: true)
-            .ifEmpty {
-                exit 1, "File ${params.genome} cannot be found."
-            }
-
     // pipeline run info
     log.info "==========PIPELINE START=========="
     def summary = [:]
@@ -460,7 +450,7 @@ workflow {
     // 1. minimap & samtools
     // map raw reads to the genome assembly
     //***************************************
-    minimap2RawToGenome(params.raw_reads, params.genome, params.threads)
+    minimap2RawToGenome(file(params.raw_reads), file(params.genome), params.threads)
     // --> % of mapping
 
     //***************************************
