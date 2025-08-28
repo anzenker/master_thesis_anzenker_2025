@@ -432,18 +432,18 @@ workflow {
     if (!params.genome){
         exit 1, "Missing parameter: --genome"
     }
-    if params.skip_eggnog {
-        println("EggNOG annotation will be skipped.")
-    }
-    if params.skip_busco {
-        println("BUSCO analysis will be skipped.")
-    }
-    if params.skip_orf {
-        println("ORF Prediction and EggNOG annotation will be skipped.")
-    }
-    if params.no_plots {
-        println("No plots will be generated.")
-    }
+    if (params.skip_eggnog) {
+            log.info "EggNOG annotation will be skipped."
+        }
+    if (params.skip_busco) {
+            log.info "BUSCO analysis will be skipped."
+        }
+    if (params.skip_orf) {
+            log.info "ORF Prediction and EggNOG annotation will be skipped."
+        }
+    if (params.no_plots) {
+            log.info "No plots will be generated."
+        }
    
     // pipeline run info
     log.info "==========PIPELINE START=========="
@@ -553,19 +553,19 @@ workflow {
 
         plotBUSCOCompleteness(params.python_file_4, buscoVertebrataCompleteness.out,   // tuple: (busco_full_table_<label>.tsv, label)
                                 params.species_name ?: 'Species'
-)
-    }
+        )
+        }
 
     // 7. eggNOG (optional) - BUT only if ORF (5.) ran
-        if (!params.skip_orf && !params.skip_eggnog) {
-            //***************************************
-            //7. EggNOG Annotation
-            //***************************************
-            //params.eggnog_db = "${launchDir}/bin/"
-            def eggnog_db_path = file("${launchDir}/bin/")
-            eggnogAnnotation(transDecoderORF.out, params.threads, eggnog_db_path) //.pep, threads no., path --> .hits, .annotation, .seed_orthologs
+    if (!params.skip_orf && !params.skip_eggnog) {
+        //***************************************
+        //7. EggNOG Annotation
+        //***************************************
+        //params.eggnog_db = "${launchDir}/bin/"
+        def eggnog_db_path = file("${launchDir}/bin/")
+        eggnogAnnotation(transDecoderORF.out, params.threads, eggnog_db_path) //.pep, threads no., path --> .hits, .annotation, .seed_orthologs
 
-        } 
+     } 
 
     // 8) Overview (only if ALL present)
     if ( !params.no_plots && !params.skip_busco && !params.skip_orf && !params.skip_eggnog ) {
