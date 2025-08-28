@@ -513,8 +513,8 @@ workflow {
         //***************************************
         //6. BUSCO Vertebrate - Completeness Assessment
         //***************************************
-        params.busco_d_path = "${launchDir}/bin/busco_downloads/6_busco_completeness_stacked_barplot.py"
-        //def busco_downloads_path = file("${launchDir}/bin/busco_downloads/6_busco_completeness_stacked_barplot.py")
+        params.busco_d_path = "${launchDir}/bin/busco_downloads/lineages/vertebrata_odb10/"
+        //def busco_downloads_path = file("${launchDir}/bin/busco_downloads/lineages/vertebrata_odb10/")
         params.python_file_4 = "${projectDir}/python_scripts/6_busco_completeness_stacked_barplot.py"
         //def python_script_path_4 = file("${projectDir}/python_scripts/6_busco_completeness_stacked_barplot.py")
 
