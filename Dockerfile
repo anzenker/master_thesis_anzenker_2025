@@ -1,7 +1,7 @@
 FROM continuumio/miniconda3
 
 LABEL maintainer="Annika Zenker <anzenker@students.uni-mainz.de"
-LABEL description="Docker image for the nanoTome pipeline: long-read transcriptome analysis with Nanopore dRNA-seq data."
+LABEL description="Docker image for the ms-pipeline: long-read transcriptome analysis with Nanopore dRNA-seq data."
 LABEL version="1.0"
 
 # Prepare conda
