@@ -230,6 +230,9 @@ process plotBUSCOCompleteness {
     script:
     """
     #!/bin/bash
+    # ensure matplotlib uses a writable dir
+    export MPLCONFIGDIR="\$PWD/.mplconfig"
+    mkdir -p \$MPLCONFIGDIR
     
     python $python_script "${full_table}/run_vertebrata_odb10/full_table.tsv" $species_name "busco_plot_${label}"
     """
