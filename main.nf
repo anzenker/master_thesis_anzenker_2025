@@ -318,7 +318,7 @@ process plotTotalTranscripts {
     export MPLCONFIGDIR="\$PWD/.mplconfig"
     mkdir -p \$MPLCONFIGDIR
 
-    python $python_script $input_fasta_1 $input_fasta_2 --color1 $plot_color
+    python $python_script $input_fasta_1 $input_fasta_2 --color1 '${plot_color}'
     """ 
 }
 
