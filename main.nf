@@ -84,7 +84,7 @@ process buscoVertebrataCompleteness {
 
     script:
     """
-    busco -i $input_fasta_file -l vertebrata_odb10 --download_path $busco_downloads_path -o "busco_output_${input_fasta_file.baseName}" -m transcriptome --offline -c $threads  
+    busco -i $input_fasta_file -l vertebrata_odb10 --offline --download_path $busco_downloads_path -o "busco_output_${input_fasta_file.baseName}" -m transcriptome --offline -c $threads  
     """
 }
 
@@ -526,7 +526,7 @@ workflow {
         //6. BUSCO Vertebrate - Completeness Assessment
         //***************************************
         params.busco_d_path = "${launchDir}/bin/busco_downloads/lineages/vertebrata_odb10/"
-        //def busco_downloads_path = file("${launchDir}/bin/busco_downloads/lineages/vertebrata_odb10/")
+        //def busco_downloads_path = file("${launchDir}/bin/busco_downloads/")
         params.python_file_4 = "${projectDir}/python_scripts/6_busco_completeness_stacked_barplot.py"
         //def python_script_path_4 = file("${projectDir}/python_scripts/6_busco_completeness_stacked_barplot.py")
 
