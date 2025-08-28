@@ -80,7 +80,7 @@ process buscoVertebrataCompleteness {
         path busco_downloads_path
     
     output:
-        tuple path "busco_output_${input_fasta_file.baseName}/", val(label)
+        tuple path("busco_output_${input_fasta_file.baseName}/"), val(label)
 
     script:
     """
