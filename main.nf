@@ -231,7 +231,7 @@ process plotBUSCOCompleteness {
     """
     #!/bin/bash
     
-    python $python_script ${busco_full_table}/run_vertebrata_odb10/full_table.tsv $species_name $output_path busco_plot_${label}
+    python $python_script "${busco_full_table}/run_vertebrata_odb10/full_table.tsv" $species_name $output_path "busco_plot_${label}"
     """
 }
 
