@@ -279,6 +279,18 @@ process plotORFStatistics {
     script:
     """
     #!/bin/bash
+    set -euo pipefail
+
+    # make output + writable caches/temp
+    mkdir -p 2_ipg .mplconfig .cache tmp
+
+    # ensure matplotlib uses a local, writable cache & non-GUI backend
+    export MPLCONFIGDIR="$PWD/.mplconfig"
+    export MPLBACKEND=Agg
+    export XDG_CACHE_HOME="$PWD/.cache"
+
+    # avoid tiny container /tmp
+    export TMPDIR="$PWD/tmp"
 
     python $python_script $input_fasta $input_pep -plot_color "$plot_color"
     """
