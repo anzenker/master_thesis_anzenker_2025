@@ -230,9 +230,12 @@ process plotBUSCOCompleteness {
     script:
     """
     #!/bin/bash
-    # ensure matplotlib uses a writable dir
+
+    # ensure matplotlib + fontconfig use writable dirs
     export MPLCONFIGDIR="\$PWD/.mplconfig"
-    mkdir -p \$MPLCONFIGDIR
+    export XDG_CACHE_HOME="\$PWD/.cache"
+    mkdir -p "\$MPLCONFIGDIR" "\$XDG_CACHE_HOME/fontconfig"
+
     # ensure output folder exists
     mkdir -p "busco_plot_${label}"
 
@@ -259,9 +262,11 @@ process plotIsoformPerGene {
     script:
     """
     #!/bin/bash
-    # ensure matplotlib uses a writable dir
+
+    # ensure matplotlib + fontconfig use writable dirs
     export MPLCONFIGDIR="\$PWD/.mplconfig"
-    mkdir -p \$MPLCONFIGDIR
+    export XDG_CACHE_HOME="\$PWD/.cache"
+    mkdir -p "\$MPLCONFIGDIR" "\$XDG_CACHE_HOME/fontconfig"
 
     # make output dir expected by your script
     mkdir -p 2_ipg
@@ -320,9 +325,10 @@ process plotTotalTranscripts {
     """
     #!/bin/bash
 
-    # ensure matplotlib uses a writable dir
+    # ensure matplotlib + fontconfig use writable dirs
     export MPLCONFIGDIR="\$PWD/.mplconfig"
-    mkdir -p \$MPLCONFIGDIR
+    export XDG_CACHE_HOME="\$PWD/.cache"
+    mkdir -p "\$MPLCONFIGDIR" "\$XDG_CACHE_HOME/fontconfig"
 
     python $python_script $input_fasta_1 $input_fasta_2 --color1 "${plot_color}"
     """ 
@@ -351,9 +357,10 @@ process plotOverviewQuality {
     """
     #!/bin/bash
 
-    # ensure matplotlib uses a writable dir
+    # ensure matplotlib + fontconfig use writable dirs
     export MPLCONFIGDIR="\$PWD/.mplconfig"
-    mkdir -p \$MPLCONFIGDIR
+    export XDG_CACHE_HOME="\$PWD/.cache"
+    mkdir -p "\$MPLCONFIGDIR" "\$XDG_CACHE_HOME/fontconfig"
 
     python $python_script $input_gtf $input_fasta $input_pep $input_busco $input_eggnog overview_quality --species_name $species_name
     """ 
@@ -376,7 +383,6 @@ process stringtie2Transcriptome {
     """
 }
 
-//also include TransDecoder.Predict with homology options????
 process transDecoderORF {
     publishDir "${params.outdir}/5_frame_selection", mode: 'copy'
 
