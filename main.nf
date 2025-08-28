@@ -471,7 +471,7 @@ workflow {
     //3. gffread
     // read seqeuences with gtf and genome assembly into fasta file
     //***************************************
-    gffreadToFasta(stringtie2Transcriptome.out, params.genome)
+    gffreadToFasta(stringtie2Transcriptome.out, file(params.genome))
     // OUTPUT --> read metrics & plot read length distribution
 
     //***************************************
