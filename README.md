@@ -2,15 +2,15 @@
 
 ###### ================================================================================
 ###### OVERVIEW
-+ 1. [ This Repository ](#rep)
-+ 2. [ Hardware and Operating System ](#OS)
-+ 3. [ Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data ](#guide)
+* 1. [ This Repository ](#rep)
+* 2. [ Hardware and Operating System ](#OS)
+* 3. [ Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data ](#guide)
     * 3.1 [ Basecalling & Preprocessing ](#prepros)
     * 3.2 [ Master Thesis Pipeline (ms-pipeline) ](#ms-pipeline)
     * 3.3 [ Additional Annoation with BLAST ](#addanno)
-+ 4. [ Some file formats explained ](#file-formats)
-+ 5. [ Some extra commands ](#extra)
-+ 6. [ Abbreviations ](#abbrev)
+* 4. [ Some file formats explained ](#file-formats)
+* 5. [ Some extra commands ](#extra)
+* 6. [ Abbreviations ](#abbrev)
 ###### ================================================================================
 
 <a name="rep"></a>
@@ -19,7 +19,7 @@ This repository provides a step-by-step guide for assembling and annotating a tr
 
 This guide is separated into 3 Parts:
 1. Basecalling & Preprocessing of the Raw Sequencing Data
-2. ms-pipeline: Transcriptome Assembly & Fucntional Assessment
+2. ms-pipeline: Transcriptome Assembly & Functional Assessment
 3. Additional Annotation via BLAST/UniProt
 
 <a name="OS"></a>
@@ -33,7 +33,7 @@ Dorado basecalling was executed on Linux-based systems (x86_64) equipped either 
 
 <a name="prepros"></a>
 ## 3.1. Basecalling & Preprocessing
-Basecalling and Preprocessing can be acomplished in different approaches. The one chosen for this approach is described in detail in [README_basecalling_and_preprocessing.md](/docs/README_basecalling_and_preprocessing.md).
+Basecalling and Preprocessing can be accomplished in different approaches. A useful approach for this is described in detail in [commands.md](/docs/commands.md).
 
 <a name="ms-pipeline"></a>
 ## 3.2. ms-pipeline (Master Thesis Pipeline)
@@ -146,7 +146,7 @@ nextflow run main.nf --raw_reads raw_reads.fastq --genome genome.fa --threads NO
 ```
 <a name="manual"></a>
 #### 3.2.4 Code implemented into the nanoTome pipeline
-All code implemented into the pipeline can be found in [README_commands_implemented_in_pipeline.md](/docs/README_commands_implemented_in_pipeline.md) for manual execution.
+All code implemented into the pipeline can be found in [commands.md](/docs/commands.md) for manual execution.
 
 <a name="addanno"></a>
 ## 4.3. Additional Annotation
@@ -185,8 +185,11 @@ blastp -query transdecoder_dir/longest_orfs.pep  \
 
 <a name="file-formats"></a>
 ## 5. Some file formats explained
-Some file formats used to analyse the data are explained in  [`README_file_formats.md`](README_file_formats.md).
+Some file formats used to analyse the data are explained in  [file_formats.md](/docs/file_formats.md).
 
+<a name="soft"></a>
+## 6. Links to software tools for manual installation
+[software_links.md](/docs/software_links.md)
 
 <a name="extra"></a>
 ## 6. Some extra commands
