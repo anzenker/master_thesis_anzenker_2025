@@ -542,8 +542,8 @@ workflow {
             //***************************************
             //7. EggNOG Annotation
             //***************************************
-            params.eggnog_db = '${launchDir}/bin/'
-            //def eggnog_databases_path = file('${launchDir}/bin/')
+            params.eggnog_db = "${launchDir}/bin/"
+            //def eggnog_databases_path = file("${launchDir}/bin/")
             eggnogAnnotation(transDecoderORF.out, params.threads, params.eggnog_db) //.pep, threads no., path --> .hits, .annotation, .seed_orthologs
 
         } 
