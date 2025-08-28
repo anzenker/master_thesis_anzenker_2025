@@ -33,9 +33,9 @@ Dorado basecalling was executed on Linux-based systems (x86_64) equipped either 
 
 <a name="prepros"></a>
 ## 3.1. Basecalling & Preprocessing
-Basecalling and Preprocessing can be acomplished in different approaches. The one chosen for this approach is described in detail in [README_basecalling_and_preprocessing.md](README_basecalling_and_preprocessing.md).
+Basecalling and Preprocessing can be acomplished in different approaches. The one chosen for this approach is described in detail in [README_basecalling_and_preprocessing.md](/docs/README_basecalling_and_preprocessing.md).
 
-<a name="nanotome"></a>
+<a name="ms-pipeline"></a>
 ## 3.2. ms-pipeline (Master Thesis Pipeline)
 
 The ms-pipeline is designed to assemble transcriptomes from Oxford Nanopore Technologies (ONT) direct RNA sequencing (dRNA-seq) data, using a reference genome as a guide.
@@ -146,7 +146,7 @@ nextflow run main.nf --raw_reads raw_reads.fastq --genome genome.fa --threads NO
 ```
 <a name="manual"></a>
 #### 3.2.4 Code implemented into the nanoTome pipeline
-All code implemented into the pipeline can be found in [README_commands_implemented_in_pipeline.md](README_commands_implemented_in_pipeline.md) for manual execution.
+All code implemented into the pipeline can be found in [README_commands_implemented_in_pipeline.md](/docs/README_commands_implemented_in_pipeline.md) for manual execution.
 
 <a name="addanno"></a>
 ## 4.3. Additional Annotation
