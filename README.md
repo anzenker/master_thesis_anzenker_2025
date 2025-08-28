@@ -92,12 +92,12 @@ The nextflow pipeline runs on a Docker image by default.
 nextflow run main.nf -help
 
 #run
-nextflow run main.nf --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS
+nextflow run anzenker/master_thesis_anzenker_2025 --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS
 ```
 **Quickstart - Run pipeline without eggNOG & BUSCO database download**
 Information: There will only be the functional assessment of predicted ORFs with these parameters.
 ```
-nextflow run main.nf --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS --skip-eggnog --skip-busco
+nextflow run anzenker/master_thesis_anzenker_2025 --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS --skip-eggnog --skip-busco
 ```
 
 *Optional parameters 
