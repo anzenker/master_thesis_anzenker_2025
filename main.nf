@@ -264,7 +264,7 @@ process plotIsoformPerGene {
     # make output dir expected by your script
     mkdir -p 2_ipg
     
-    python $python_script $gtf_input_file 2_ipg -plot_color "$color"
+    python $python_script $gtf_input_file 2_ipg -plot_color1 "$color"
     """
 }
 
