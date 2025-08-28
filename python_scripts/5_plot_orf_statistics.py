@@ -108,6 +108,10 @@ def main():
     # collect jobs (only include fully specified species)
     jobs = []
     species_order = []
+
+    species_name1 = args.species_name1 if args.species_name1 else "species 1"
+    species_name2 = args.species_name2 if args.species_name2 else "species 2"
+    species_name3 = args.species_name3 if args.species_name3 else "species 3"
     
     # species1
     species_order.append(args.species_name1)
@@ -178,7 +182,7 @@ if __name__ == "__main__":
     # required species
     parser.add_argument("input_fasta1", help="Path to Transcriptome FASTA file")
     parser.add_argument("input_pep1", help="Path to TransDecoder PEP file")
-    parser.add_argument("species_name1", help="Name of the species")
+    parser.add_argument("-species_name1", help="Name of the species")
     #the following are optional user inputs
     parser.add_argument("-plot_color1", default=None, help="Color for plotting in hex code")
     # optional species 2
