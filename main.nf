@@ -290,8 +290,6 @@ process plotORFStatistics {
     # ensure matplotlib uses a writable dir
     export MPLCONFIGDIR="\$PWD/.mplconfig"
     mkdir -p \$MPLCONFIGDIR
-    export XDG_CACHE_HOME="$PWD/.cache"
-    mkdir -p "$XDG_CACHE_HOME"
 
     python $python_script $input_fasta $input_pep -plot_color "$plot_color"
     """
