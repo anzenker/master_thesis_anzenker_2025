@@ -84,7 +84,7 @@ process buscoVertebrataCompleteness {
 
     script:
     """
-    busco -i $input_fasta_file -l vertebrata_odb10 --offline --download_path $busco_downloads_path -o "busco_output_${input_fasta_file.baseName}" -m transcriptome --offline -c $threads  
+    busco -i $input_fasta_file -l vertebrata_odb10 --offline --download_path $busco_downloads_path -o "busco_output_${input_fasta_file.baseName}" -m transcriptome -f -c $threads  
     """
 }
 
