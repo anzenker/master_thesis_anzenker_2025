@@ -287,8 +287,8 @@ process plotORFStatistics {
     #!/bin/bash
 
     # ensure matplotlib uses a writable dir
-    export MPLCONFIGDIR="\$PWD/.mplconfig"
-    mkdir -p \$MPLCONFIGDIR
+    export MPLCONFIGDIR="$PWD/.mplconfig"; mkdir -p "$MPLCONFIGDIR"
+    export XDG_CACHE_HOME="$PWD/.cache";   mkdir -p "$XDG_CACHE_HOME"
 
     python $python_script $input_fasta $input_pep -plot_color "$plot_color"
     """
@@ -318,7 +318,7 @@ process plotTotalTranscripts {
     export MPLCONFIGDIR="\$PWD/.mplconfig"
     mkdir -p \$MPLCONFIGDIR
 
-    python $python_script $input_fasta_1 $input_fasta_2 --color1 '${plot_color}'
+    python $python_script $input_fasta_1 $input_fasta_2 --color1 "${plot_color}"
     """ 
 }
 
@@ -530,7 +530,14 @@ workflow {
         params.python_file_4 = "${projectDir}/python_scripts/6_busco_completeness_stacked_barplot.py"
         //def python_script_path_4 = file("${projectDir}/python_scripts/6_busco_completeness_stacked_barplot.py")
 
-        buscoVertebrataCompleteness(params.threads, transcriptome_ch, params.busco_d_path)
+        // build two tuple channels, then merge them
+        def total_ch     = gffreadToFasta.out.map     { f -> tuple(f, 'total') }
+        def canonical_ch = canonicalBestCov3.out.map  { f -> tuple(f, 'canonical') }
+        
+        // channel of (path,label) items
+        def transcriptome_labeled = total_ch.mix(canonical_ch)
+
+        buscoVertebrataCompleteness(params.threads, transcriptome_labeled, params.busco_d_path)
 
         plotBUSCOCompleteness(params.python_file_4, buscoVertebrataCompleteness.out,   // tuple: (busco_full_table_<label>.tsv, label)
                                 params.species_name ?: 'Species'
