@@ -1,27 +1,17 @@
 #!/usr/bin/env nextflow
+nextflow.enable.dsl=2
 
 // set default values for optional parameters - can be changed by user input 
 params.help = false
 params.outdir = 'RESULTS'
 params.threads = 1
-params.skip_eggnog = false
-params.help = false
+params.species_name = null
 params.color = "#C79FEF" //lilac
+params.skip_eggnog = false
+params.skip_busco = false
+params.skip_orf = false
+params.no_plots = false
 
-//include { minimap2RawToGenome } from './modules/minimap2RawToGenome.nf'
-//include { stringtie2Transcriptome } from './modules/stringtie2Transcriptome.nf'
-//include { gffreadToFasta } from './modules/gffreadToFasta.nf'
-//include { canonicalBestCov1 } from './modules/canonicalBestCov.nf'
-//include { canonicalBestCov2 } from './modules/canonicalBestCov.nf'
-//include { canonicalBestCov3 } from './modules/canonicalBestCov.nf'
-//include { buscoVertebrataCompleteness } from './modules/buscoVertebrataCompleteness.nf'
-//include { transDecoderORF } from './modules/transDecoderORF.nf'
-//include { eggnogAnnotation } from './modules/eggnogAnnotation.nf'
-//include { uniprotAnnotation } from './modules/uniprotAnnotation.nf'
-
-//include { plotIsoformPerGene } from './modules/plotIsoformPerGene.nf'
-//include { plotLengthDistribution } from './modules/plotLengthDistribution.nf'
-//include { plotTotalTranscripts } from './modules/plotTotalTranscripts.nf'
 
 def helpMessage() {
         log.info """
@@ -34,18 +24,23 @@ def helpMessage() {
 
 
         Mandatory arguments:
-            --raw_reads                 Path to input data - raw seqeuncing reads
-            --genome                    Path to input data - reference genome file (FASTA)
-            --with-docker               run pipeline with docker
+            -r/--raw_reads              Path to input data - raw seqeuncing reads
+            -g/--genome                 Path to input data - reference genome file (FASTA)
+            -with-docker                run pipeline with docker
 
         Other options:
-            --threads                   no. of threads
-            --outdir                    The output directory where the results will be saved
+            -t/--threads                no. of threads (default: 1)
+            -o/--outdir                 The output directory where the results will be saved
             -w/--work-dir               The temporary directory where intermediate data will be saved
-            --color                     Specific color for output plots created with Python. Default color is lavender (#C79FEF).
+            -sn/--species_name          For species names "A. arizonae", "A. marmoratus" and "A. neomexicanus" a specified plotting color is given.
+            -c/--color                  Specific color for output plots created with Python. Default color is lavender (#C79FEF).
+
         
         Process Options:
-            --skip_eggnog               Skip EggNOG annotation step
+            --skip_eggnog true          Skip EggNOG annotation step
+            --skip_orf true             Skip TransDecoder ORF Prediction & eggNOG annotation.stripIndent
+            --skip_busco true           Skip BUSCO analysis.
+            --no_plots true             No output plot will be generated.
 
         """.stripIndent()
     }
@@ -67,18 +62,12 @@ process get_software_versions {
     seqkit --version        >> software_versions.txt 2>&1
     python --version        >> software_versions.txt 2>&1
     pip --version           >> software_versions.txt 2>&1
-    biopython --version     >> software_versions.txt 2>&1
-    pandas --version        >> software_versions.txt 2>&1
-    bbmap --version         >> software_versions.txt 2>&1
-    blast --version         >> software_versions.txt 2>&1
-    augustus --version      >> software_versions.txt 2>&1
-    metaeuk --version       >> software_versions.txt 2>&1
-    prodigal --version      >> software_versions.txt 2>&1
-    hmmer --version         >> software_versions.txt 2>&1
-    sepp --version          >> software_versions.txt 2>&1
-    r-base --version        >> software_versions.txt 2>&1         
-    r-ggplot2 --version     >> software_versions.txt 2>&1
-    eggnog-mapper --version >> software_versions.txt 2>&1
+    stringtie --version     >> software_versions.txt 2>&1
+    gffread --version       >> software_versions.txt 2>&1
+    minimap2 --version      >> software_versions.txt 2>&1
+    samtools --version      >> software_versions.txt 2>&1
+    TransDecoder.LongOrfs   >> software_versions.txt 2>&1
+    emapper.py --version    >> software_versions.txt 2>&1
     """
 }
 
@@ -87,18 +76,15 @@ process buscoVertebrataCompleteness {
 
     input:
         val threads
-        path input_fasta_file
+        tuple path(input_fasta_file), val(label)
         path busco_downloads_path
     
     output:
-        path "busco_output_${input_fasta_file.baseName}/"
-        path "short_summary.${input_fasta_file.baseName}.vertebrata.odb12.XXX.txt"
+        tuple path "busco_output_${input_fasta_file.baseName}/", val(label)
 
     script:
     """
-    busco -i $input_fasta_file -l vertebrata_odb10 --download_path $busco_downloads_path -o "busco_output_${input_fasta_file.baseName}" -m transcriptome --offline -c $threads
-
-    cp busco_output_${input_fasta_file.baseName}/short_summary.*.txt short_summary.${input_fasta_file.baseName}.vertebrata.odb12.XXX.txt
+    busco -i $input_fasta_file -l vertebrata_odb10 --download_path $busco_downloads_path -o "busco_output_${input_fasta_file.baseName}" -m transcriptome --offline -c $threads  
     """
 }
 
@@ -181,7 +167,7 @@ process eggnogAnnotation {
 
     script:
     """
-    emapper.py  -m diamond --itype proteins -i $input_orf_pep -o 'eggnog_${input_orf_pep.baseName}' --data_dir $eggDB_path --cpu $threads
+    emapper.py  -m diamond --itype proteins -i $input_orf_pep -o 'eggnog_${input_orf_pep.baseName}' --data_dir $eggDB_path --cpu $threads > emapper.log 2>&1
 
     """
 }
@@ -205,6 +191,8 @@ process gffreadToFasta {
 }
 
 process minimap2RawToGenome {
+    when:
+        !params.no_plots
 
     publishDir "${params.outdir}/1_minimap2_output", mode: 'copy'
 
@@ -225,7 +213,32 @@ process minimap2RawToGenome {
     """
 }
 
+process plotBUSCOCompleteness {
+    when:
+        !params.no_plots
+
+    publishDir "${params.outdir}/8_plots"
+
+    input:
+    path python_script
+    tuple path(full_table), val(label)
+    val species_name
+
+    output:
+    path "busco_plot_${label}/6_busco_completeness_stacked_barplot.png"
+
+    script:
+    """
+    #!/bin/bash
+    
+    python $python_script ${busco_full_table}/run_vertebrata_odb10/full_table.tsv $species_name $output_path busco_plot_${label}
+    """
+}
+
 process plotIsoformPerGene {
+    when:
+        !params.no_plots
+
     publishDir "${params.outdir}/8_plots"
 
     input:
@@ -234,53 +247,22 @@ process plotIsoformPerGene {
     val color
     
     output:
-    path "${gtf_input_file.baseName}_isoform_per_gene_barplot.png"
-    path "${gtf_input_file.baseName}_isoform_per_gene_barplot.txt"
-
+    path "2_ipg/${gtf_input_file.baseName}_isoform_per_gene_barplot.tsv"
+    path "2_ipg/${gtf_input_file.baseName}_isoform_per_gene_barplot.png"
+    path "2_ipg/${gtf_input_file.baseName}_isoform_per_gene_1_to_15_barplot.png"
 
     script:
     """
     #!/bin/bash
     
-    python $python_script $gtf_input_file "$color"
+    python $python_script $gtf_input_file 2_ipg -plot_color "$color"
     """
-}
-
-process plotLengthDistribution {
-    publishDir "${params.outdir}/8_plots", mode: 'copy'
-
-    input:
-    path input_fasta_file
-    
-    output:
-    path "${input_fasta_file.baseName}_length_distribution.png"
-
-    script:
-    """
-    #!/opt/conda/bin/python
-    
-    from Bio import SeqIO
-    import pandas as pd 
-    import matplotlib.pyplot as plt
-
-    records = list(SeqIO.parse("$input_fasta_file", "fasta"))
-    lengths = [len(record.seq) for record in records]
-    no_seqs = len(records)
-    
-    df = pd.DataFrame({"Sequence Length": lengths})
-    length_value_counts_df = df.value_counts().reset_index()
-    length_value_counts_df.columns = ["Transcript Length", "Count"]
-
-    ax = length_value_counts_df.plot.bar(x='Count', y='Transcript Length', rot=0, color="skyblue")
-    ax.set_xlabel("Number of Transcripts")
-    ax.set_ylabel("Transcript Length")
-    ax.set_title("Length Distribution of Transcriptome ($input_fasta_file)")
-    plt.tight_layout()
-    plt.savefig('${input_fasta_file.baseName}_length_distribution.png')
-    """ 
 }
 
 process plotORFStatistics {
+    when:
+        !params.no_plots
+
     publishDir "${params.outdir}/8_plots", mode: 'copy'
 
     input:
@@ -290,16 +272,22 @@ process plotORFStatistics {
     val plot_color
 
     output:
-    path "${input_fasta.baseName}_orf_prediction_barplot.png"
-    path "${input_fasta.baseName}_orf_categories_pie_chart.png"
+    path "orf_compare_pivot.csv" 
+    path "orf_compare_long.csv"
+    path "orf_compare_grouped_bar.png"
 
     script:
     """
-    python $python_script -input_fasta $input_fasta -input_pep $input_pep -plot_color "$plot_color"
+    #!/bin/bash
+
+    python $python_script $input_fasta $input_pep -plot_color "$plot_color"
     """
 }
 
 process plotTotalTranscripts {
+    when:
+        !params.no_plots
+
     publishDir "${params.outdir}/8_plots", mode: 'copy'
 
     input:
@@ -309,13 +297,41 @@ process plotTotalTranscripts {
     val plot_color
     
     output:
-    path "no_all_transcripts_vs_canonical_transcripts.png"
+    path "transcript_counts_counts.csv"
+    path "transcript_counts_grouped_bar.png"
 
     script:
     """
     #!/bin/bash
     
-    python $python_script $input_fasta_1 $input_fasta_2 $plot_color
+    python $python_script $input_fasta_1 $input_fasta_2 --color1 $plot_color
+    """ 
+}
+
+process plotOverviewQuality {
+    when:
+        !params.no_plots
+
+    publishDir "${params.outdir}/8_plots", mode: 'copy'
+
+    input:
+    path python_script
+    path input_gtf
+    path input_fasta
+    path input_pep
+    path input_busco
+    path input_eggnog
+    val species_name
+    
+    output:
+    path "overview_quality/transcript_counts_counts.csv"
+    path "overview_quality/transcript_counts_grouped_bar.png"
+
+    script:
+    """
+    #!/bin/bash
+    
+    python $python_script $input_gtf $input_fasta $input_pep $input_busco $input_eggnog overview_quality --species_name $species_name
     """ 
 }
 
@@ -411,97 +427,128 @@ workflow {
     summary['User']             = workflow.userName
     summary['Start Time']       = workflow.start
 
-    // define parameters & input paths
-    def eggnog_databases_path = file('./bin/')
-    def uniprot_databases_path = file('./bin/uniprot_sprot.fasta')
-    def busco_downloads_path = file('./bin/busco_downloads/')
-    def python_script_path_1 = file('./python_scripts/plot_transcript_numbers.py')
-    def python_script_path_2 = file('./python_scripts/plot_isoform_per_gene.py')
-    def python_script_path_3 = file('./python_scripts/plot_orf_statistics.py')
-
-
     //run processes
-
     //***************************************
-    //1. map raw reads to the genome assembly
+    // 1. minimap & samtools
+    // map raw reads to the genome assembly
     //***************************************
     minimap2RawToGenome(params.raw_reads, params.genome, params.threads)
     // --> % of mapping
 
     //***************************************
-    //2. reconstruct transcriptome from mapping
+    // 2. stringtie
+    // reconstruct transcriptome from mapping
     //***************************************
     stringtie2Transcriptome(params.threads, minimap2RawToGenome.out[0])
-    // --> plot isoform per gene
-
+    if (!params.no_plots) {
+        //----------------------------------------
+        // plot isoform per gene
+        //def isoform_plot_outdir = "${params.outdir}/8_plots"
+        def python_script_path_2 = file('./python_scripts/2_plot_isoform_per_gene.py')
+        plotIsoformPerGene(python_script_path_2, stringtie2Transcriptome.out, params.color)
+        //----------------------------------------
+    }
     //***************************************
-    //3. read seqeuences with gtf and genome assembly into fasta file
+    //3. gffread
+    // read seqeuences with gtf and genome assembly into fasta file
     //***************************************
     gffreadToFasta(stringtie2Transcriptome.out, params.genome)
     // OUTPUT --> read metrics & plot read length distribution
 
-
-
     //***************************************
-    //4. generate canonical transcriptome from isoform transcripts with the highest coverage 
+    // 4. awk, python, seqkit
+    // generate canonical transcriptome from isoform transcripts with the highest coverage 
     //***************************************
     canonicalBestCov1(stringtie2Transcriptome.out) //.gtf --> .tsv
     canonicalBestCov2(canonicalBestCov1.out, gffreadToFasta.out) //.tsv, .fasta --> .txt
     canonicalBestCov3(canonicalBestCov2.out, gffreadToFasta.out) //.txt, .fasta --> .fasta
-    // OUTPUT --> read metrics & plot read length distribution
-    // --> ?????overlaying read length distribution??????
 
     // create channel from total transcriptome and canonical transcriptome
-    transcriptome_ch = gffreadToFasta.out
-                        .combine(canonicalBestCov3.out)
-                        .flatten()
-                        .eachWithIndex( { fasta, idx -> tuple(fasta, idx) } )
-
-    //***************************************
-    //5. ORF Prediction
-    //***************************************
-    transDecoderORF(canonicalBestCov3.out) //.fasta --> longest_orfs.pep
+    transcriptome_ch = gffreadToFasta.out.combine(canonicalBestCov3.out).flatten()
 
 
-    //***************************************
-    //6. BUSCO Vertebrate - Completeness Assessment
-    //***************************************
-    buscoVertebrataCompleteness(params.threads, transcriptome_ch, busco_downloads_path)
+    if (!params.no_plots) {
+        //----------------------------------------
+        // plot total transcriptome no all vs canonical 
+        def python_script_path_1 = file('./python_scripts/4_plot_total_vs_canonical_transcript_count.py')
+        plotTotalTranscripts(python_script_path_1, gffreadToFasta.out, canonicalBestCov3.out, params.color)
+        //----------------------------------------
+    }
 
 
-    //***************************************
-    //7. EggNOG Annotation
-    //***************************************
-    eggnogAnnotation(transDecoderORF.out, params.threads, eggnog_databases_path) //.pep, threads no., path --> .hits, .annotation, .seed_orthologs
+    //transcriptome_ch = gffreadToFasta.out
+    //                .combine(canonicalBestCov3.out)
+    //                .map { a, b -> [a, b] } // ensure list structure
+    //                .collectMany { it }    // flatten the list of pairs
+    //                .enumerate()           // adds index
 
-    //***************************************
-    //8. PLOTS
-    //***************************************
-    //----------------------------------------
-    // plot isoform per gene
-    //def isoform_plot_outdir = "${params.outdir}/8_plots"
-    plotIsoformPerGene(python_script_path_2, stringtie2Transcriptome.out, params.color)
-    //----------------------------------------
-    //----------------------------------------
-    // plot transcriptome length distribution - combine .fasta into channel and run process
-    plotLengthDistribution(transcriptome_ch)
-    //----------------------------------------
-    //----------------------------------------
-    // plot comparison of total transcript count
-    plotTotalTranscripts(python_script_path_1, gffreadToFasta.out, canonicalBestCov3.out, params.color)
-    //----------------------------------------
-    //----------------------------------------
-    // plot BUSCO output
+    if (!params.no_plots) {
+        //----------------------------------------
+        // plot transcriptome length distribution - combine .fasta into channel and run process
+        plotLengthDistribution(transcriptome_ch)
+        //----------------------------------------
+    }
 
-    //----------------------------------------    
-    //----------------------------------------
-    // plot ORF category distribution
-    plotORFStatistics(python_script_path_3, canonicalBestCov3.out, transDecoderORF.out, params.color)
 
+    // 5. TransDecoder (optional)
+    if (!params.skip_orf) {
+        //***************************************
+        //5. ORF Prediction
+        //***************************************
+        transDecoderORF(canonicalBestCov3.out) //.fasta --> longest_orfs.pep
+        //----------------------------------------
+        if (!params.no_plots) {
+            //----------------------------------------
+            // plot ORF category distribution
+            def python_script_path_3 = file('./python_scripts/5_plot_orf_statistics.py')
+            plotORFStatistics(python_script_path_3, canonicalBestCov3.out, transDecoderORF.out, params.color)
+            //----------------------------------------
+        }   
+    }
+
+    // 6. BUSCO (otional)
+    if (!params.skip_busco) {
+        //***************************************
+        //6. BUSCO Vertebrate - Completeness Assessment
+        //***************************************
+        def busco_downloads_path = file('./bin/busco_downloads/')
+        def python_script_path_4 = file('./python_scripts/6_busco_completeness_stacked_barplot.py')
+
+        buscoVertebrataCompleteness(params.threads, transcriptome_ch, busco_downloads_path)
+
+        plotBUSCOCompleteness(python_script_path_4, buscoVertebrataCompleteness.out,   // tuple: (busco_full_table_<label>.tsv, label)
+                                params.species_name ?: 'Species'
+)
+    }
+
+    // 7. eggNOG (optional) - BUT only if ORF (5.) ran
+        if (!params.skip_orf && !params.skip_eggnog) {
+            //***************************************
+            //7. EggNOG Annotation
+            //***************************************
+            def eggnog_databases_path = file('./bin/')
+            eggnogAnnotation(transDecoderORF.out, params.threads, eggnog_databases_path) //.pep, threads no., path --> .hits, .annotation, .seed_orthologs
+
+        } 
+
+    // 8) Overview (only if ALL present)
+    if ( !params.no_plots && !params.skip_busco && !params.skip_orf && !params.skip_eggnog ) {
+        def overview_py = file('./python_scripts/X_overview_quality.py')
+        // choose which BUSCO channel to feed (e.g., canonical only):
+        plotOverviewQuality(
+        overview_py,
+        stringtie2Transcriptome.out,  // GTF
+        gffreadToFasta.out,           // FASTA
+        transDecoderORF.out,          // PEP
+        buscoVertebrataCompleteness.out, // full_table.tsv
+        eggnogAnnotation.out,         // .annotations
+        species_name
+        )
+    }
     //----------------------------------------
-    //----------------------------------------
-    // plot eggNOG annotation results overview
-    
-    //----------------------------------------
+    workflow.onComplete {
+        println "Pipeline finished successfully."
+        println summary
+    }
 
 }
