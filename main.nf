@@ -286,10 +286,10 @@ process plotORFStatistics {
     """
     #!/bin/bash
 
-    # ensure matplotlib uses a writable dir
-    # ensure matplotlib uses a writable dir
+    # ensure matplotlib + fontconfig use writable dirs
     export MPLCONFIGDIR="\$PWD/.mplconfig"
-    mkdir -p \$MPLCONFIGDIR
+    export XDG_CACHE_HOME="\$PWD/.cache"
+    mkdir -p "\$MPLCONFIGDIR" "\$XDG_CACHE_HOME/fontconfig"
 
     python $python_script $input_fasta $input_pep -plot_color "$plot_color"
     """
