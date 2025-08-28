@@ -49,25 +49,10 @@ The ms-pipeline originates from a Master Thesis project studying hybridization e
 These tools are needed to set up the environment and run the pipeline.
 
 - **[nextflow](https://www.nextflow.io/docs/latest/install.html)**: Workflow manager to run the analysis pipeline in a reproducible way.
-- **[docker](https://docs.docker.com/engine/install/ubuntu/)**: Allows to run software in containers. Required for using the provided Docker Image.
-
-**Download files from this repository:**
-To run the pipline please download the following directory structure and files form this repository:
-```
-.
-└──  RESULTS
-│   ├── main.nf
-│   ├── nextflow.config
-│   ├── bin
-│       └── ... (will hold the downloaded databses for busco & eggNOG)
-│   ├── python_scripts
-│       ├── plot_compare_total_number_of_transcripts.py
-│       ├── plot_compare_isoform_per_gene.py
-│       └── plot_orf_categories.py
-```
+- **[docker](https://docs.docker.com/engine/install/ubuntu/)**: Allows to run software in containers. Required for using the provided Docker Image [anzenker/ms-pipeline](https://hub.docker.com/repository/docker/anzenker/ms-pipeline/).
 
 **Download and prepare necessary databases for the pipeline:**
-The databases only need to be downloaded if these steps want to be executed with the workflow.
+The databases only need to be downloaded if these steps are to be executed with the workflow. The pipeline resolves the local path `/bin` at runtime
 
 - **EggNOG** (~13G & ~9G & ~7G)
 ```
@@ -108,6 +93,11 @@ nextflow run main.nf -help
 
 #run
 nextflow run main.nf --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS
+```
+**Quickstart - Run pipeline without eggNOG & BUSCO database download**
+Information: There will only be the functional assessment of predicted ORFs with these parameters.
+```
+nextflow run main.nf --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS --skip-eggnog --skip-busco
 ```
 
 *Optional parameters 
