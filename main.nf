@@ -255,7 +255,7 @@ process plotIsoformPerGene {
     """
     #!/bin/bash
     
-    python $python_script $gtf_input_file 2_ipg -plot_color "$color"
+    python ${projectDir}/python_scripts/2_plot_isoform_per_gene.py $gtf_input_file 2_ipg -plot_color "$color"
     """
 }
 
