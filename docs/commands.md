@@ -13,13 +13,14 @@
     * 1.8. [ Repetitive Pattern Detection ](#rep_pat)
 
 + 2. [Nextflow Pipeline - Implemented Tool Commands](#ms_pipe)
-    * 2.1. [ dorado basecalling ](#dorado)
-    * 2.2. [ ](#minimap2)
-    * 2.3. [ ](#stringtie2)
-    * 2.4. [ ](#gffread)
-    * 2.5. [ ](#busco)
-    * 2.6. [ ](#transdec)
-    * 2.7. [ ](#python)
+    * 2.1. [ minimap2 & samtools - Mapping the raw reads to the reference genome ](#minimap2)
+    * 2.2. [ stringtie2 - Reference-guided Transcriptome Assembly ](#stringtie2)
+    * 2.3. [ gffread - Reading the transcript sequences from the Reference Genome  ](#gffread)
+    * 2.4. [ Choosing the Canonical Transcriptome ](#cano)
+    * 2.5. [ BUSCO - Vertebrata Ortholog Assessment ](#busco)
+    * 2.5. [ TransDecoder - ORF Prediction ](#transdec)
+    * 2.6. [ eggNOG Annotation] (#eggnog)
+    * 2.7. [ Custom Python Scripts - Visualization of some initial Results ](#python)
   
 ###### ================================================================================
 
@@ -131,7 +132,7 @@ As the reconstruction and analyses of biological data can be very individual and
 #### **Commands implemented into the pipeline:**
 
 <a name="minimap2"></a>
-## 1.1 [minimap2](https://lh3.github.io/minimap2/minimap2.html) & [samtools](https://www.htslib.org/doc/samtools.html)
+## 1.1 [minimap2](https://lh3.github.io/minimap2/minimap2.html) & [samtools](https://www.htslib.org/doc/samtools.html) - Mapping the raw reads to the reference genome
 ```
 # 1. minimap2 - mapping of the raw reads to the reference genome
 minimap2 -y --MD -ax splice -uf -k14 -t 24 xxx_genome.fa raw_reads.fastq.gz | samtools sort -@ 24 -o xxx_genome_mapped.bam
@@ -139,21 +140,25 @@ minimap2 -y --MD -ax splice -uf -k14 -t 24 xxx_genome.fa raw_reads.fastq.gz | sa
 samtools index xxx_genome_mapped.bam
 ```
 <a name="stringtie22"></a>
-## 1.2  [stringtie2](https://github.com/skovaka/stringtie2)
+## 1.2  [stringtie2](https://github.com/skovaka/stringtie2) - Reference-guided Transcriptome Assembly
 ```
 # 2. stringtie2 - transcriptome reconstruction
 stringtie -o stringtie2_xxx_transcripts.gtf -l NAME_PREFIX -L -p 24 xxx_genome_mapped.bam
 ```
 
 <a name="gffread"></a>
-## 1.3  [gffread](https://github.com/gpertea/gffread)
+## 2.3  [gffread](https://github.com/gpertea/gffread) - Reading the transcript sequences from the Reference Genome 
 ```
 # 3. gffread - extract transcript sequences
 gffread -w xxx_transcripts.fa -g xxx_genome.fa stringtie2_xxx_transcripts.gtf
 ```
 
+<a name="cano"></a>
+## 2.4 Choosing the Canonical Transcriptome
+...
+
 <a name="busco"></a>
-## 1.4  [BUSCO](https://busco.ezlab.org/busco_userguide.html)
+## 2.5  [BUSCO](https://busco.ezlab.org/busco_userguide.html) - Vertebrata Ortholog Assessment
 ```
 # 4. BUSCO - Transcriptome Completeness Assessment
 # offline:
@@ -163,25 +168,24 @@ busco -i xxx_transcripts.fa -l vertebrata_odb10 -o OUTPUT_FILDER/ -m transcripto
 ```
 
 <a name="transdec"></a>
-## 1.5  [TransDecoder](https://github.com/TransDecoder/TransDecoder/wiki)
+## 2.6  [TransDecoder](https://github.com/TransDecoder/TransDecoder/wiki) - ORF Prediction
 ```
 # 5. TransDecoder - predict Open Reading Frames (ORFs)
 TransDecoder.LongOrfs -t xxx_transcripts.fa 
 ```
 
 <a name="eggnog"></a>
-## 1.6  [eggNOG](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.13)
-1. Download the database
+## 2.7  [eggNOG](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.13) Annotation
+(1) Download the database
 For database download instructions, refer to [README_commands_used.md](README_commands_used.md)
 
-2. run the eggNOG command:
+(2) run the eggNOG command:
 ```
 emapper.py  -m diamond --itype proteins -i xxx_transdecoder.pep -o NAME_PREFIX --data_dir /folder/with/databases
 ```
 
 <a name="python"></a>
-## 1.7  Custom Python Scripts 
-- Choose the canonical transcript between isoforms spanning the same genomic region. The canonical transcript is chosen by the transcript with the maximum coverage calculated by strigtie2. [script](/python_scripts/choose_canonical_transcripts.py)
+## 2.8  Custom Python Scripts - Visualization of some initial Results
 - [plot](/python_scripts/4_plot_total_vs_canonical_transcript_count.py): count Total Transcriptome vs count Canonical Transcriptome
 - [plot](/python_scripts/2_plot_isoform_per_gene.py): Isoforms per Gene
 - [plot](/python_scripts/5_plot_orf_statistics.py): ORF Category distribution
