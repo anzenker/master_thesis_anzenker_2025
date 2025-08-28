@@ -444,7 +444,7 @@ workflow {
         //----------------------------------------
         // plot isoform per gene
         //def isoform_plot_outdir = "${params.outdir}/8_plots"
-        def python_script_path_2 = file('./python_scripts/2_plot_isoform_per_gene.py')
+        def python_script_path_2 = file('${projectDir}//python_scripts/2_plot_isoform_per_gene.py')
         plotIsoformPerGene(python_script_path_2, stringtie2Transcriptome.out, params.color)
         //----------------------------------------
     }
@@ -470,7 +470,7 @@ workflow {
     if (!params.no_plots) {
         //----------------------------------------
         // plot total transcriptome no all vs canonical 
-        def python_script_path_1 = file('./python_scripts/4_plot_total_vs_canonical_transcript_count.py')
+        def python_script_path_1 = file('${projectDir}//python_scripts/4_plot_total_vs_canonical_transcript_count.py')
         plotTotalTranscripts(python_script_path_1, gffreadToFasta.out, canonicalBestCov3.out, params.color)
         //----------------------------------------
     }
@@ -493,7 +493,7 @@ workflow {
         if (!params.no_plots) {
             //----------------------------------------
             // plot ORF category distribution
-            def python_script_path_3 = file('./python_scripts/5_plot_orf_statistics.py')
+            def python_script_path_3 = file('${projectDir}//python_scripts/5_plot_orf_statistics.py')
             plotORFStatistics(python_script_path_3, canonicalBestCov3.out, transDecoderORF.out, params.color)
             //----------------------------------------
         }   
@@ -504,8 +504,8 @@ workflow {
         //***************************************
         //6. BUSCO Vertebrate - Completeness Assessment
         //***************************************
-        def busco_downloads_path = file('./bin/busco_downloads/')
-        def python_script_path_4 = file('./python_scripts/6_busco_completeness_stacked_barplot.py')
+        def busco_downloads_path = file('${launchDir}/bin/busco_downloads/')
+        def python_script_path_4 = file('${projectDir}//python_scripts/6_busco_completeness_stacked_barplot.py')
 
         buscoVertebrataCompleteness(params.threads, transcriptome_ch, busco_downloads_path)
 
@@ -519,14 +519,14 @@ workflow {
             //***************************************
             //7. EggNOG Annotation
             //***************************************
-            def eggnog_databases_path = file('./bin/')
+            def eggnog_databases_path = file('${launchDir}/bin/')
             eggnogAnnotation(transDecoderORF.out, params.threads, eggnog_databases_path) //.pep, threads no., path --> .hits, .annotation, .seed_orthologs
 
         } 
 
     // 8) Overview (only if ALL present)
     if ( !params.no_plots && !params.skip_busco && !params.skip_orf && !params.skip_eggnog ) {
-        def overview_py = file('./python_scripts/X_overview_quality.py')
+        def overview_py = file('${projectDir}//python_scripts/plot_pipeline_quality_overview_fucntioanlity.py')
         // choose which BUSCO channel to feed (e.g., canonical only):
         plotOverviewQuality(
         overview_py,
