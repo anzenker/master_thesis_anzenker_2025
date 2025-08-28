@@ -348,7 +348,6 @@ process plotOverviewQuality {
     val species_name
     
     output:
-    path "overview_quality/transcript_counts_counts.csv"
     path "overview_quality/transcript_counts_grouped_bar.png"
 
     script:
