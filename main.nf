@@ -191,8 +191,6 @@ process gffreadToFasta {
 }
 
 process minimap2RawToGenome {
-    when:
-        !params.no_plots
 
     publishDir "${params.outdir}/1_minimap2_output", mode: 'copy'
 
