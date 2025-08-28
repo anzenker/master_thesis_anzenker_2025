@@ -482,13 +482,6 @@ workflow {
     //                .collectMany { it }    // flatten the list of pairs
     //                .enumerate()           // adds index
 
-    if (!params.no_plots) {
-        //----------------------------------------
-        // plot transcriptome length distribution - combine .fasta into channel and run process
-        plotLengthDistribution(transcriptome_ch)
-        //----------------------------------------
-    }
-
 
     // 5. TransDecoder (optional)
     if (!params.skip_orf) {
