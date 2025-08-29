@@ -109,12 +109,12 @@ nextflow run anzenker/master_thesis_anzenker_2025 -r main --raw_reads raw_reads.
 - --no_plots          (no outout plots are generated from the workflow)
 *
 
-<a name="pipe_dir"></a>
+<a name="pipe_flow"></a>
 #### 4.2.3 ms-pipeline flowchart overview
-[!pipeline_flowchart.png](/images/pipeline_flowchart.png)
+![pipeline_flowchart.png](/images/pipeline_flowchart.png)
 
 <a name="pipe_dir"></a>
-#### 4.2.3 ms-pipeline results directory
+#### 4.2.4 ms-pipeline results directory
 ```
 .
 └──  RESULTS
@@ -138,6 +138,8 @@ nextflow run anzenker/master_thesis_anzenker_2025 -r main --raw_reads raw_reads.
 │   ├── 8_plots
 │           └── ...
 ```
+An examplary desription of the output files and ouptut plots can be found here: [examplary_results_output.md](/docs/examplary_results_output.md)
+
 <a name="manual"></a>
 #### 3.2.4 Code implemented into the nanoTome pipeline
 All code implemented into the pipeline can be found in [commands.md](/docs/commands.md) for manual execution.
