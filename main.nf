@@ -108,7 +108,7 @@ process canonicalBestCov {
 
     python $python_script "transcript_ids_and_coverage.tsv" "${input_fasta.baseName}_canonical_ids.txt"
 
-    seqkit grep -f "transcript_ids_and_coverage.tsv" $input_fasta -o "${input_fasta.baseName}_canonical.fasta"
+    seqkit grep -f "${input_fasta.baseName}_canonical_ids.txt" $input_fasta -o "${input_fasta.baseName}_canonical.fasta"
 
     """
 }
