@@ -534,7 +534,7 @@ workflow {
         // plot total transcriptome no all vs canonical 
         params.python_file_2 = "${projectDir}/python_scripts/4_plot_total_vs_canonical_transcript_count.py"
         //def python_script_path_1 = file("${projectDir}/python_scripts/4_plot_total_vs_canonical_transcript_count.py")
-        plotTotalTranscripts(params.python_file_2, gffreadToFasta.out, canonicalBestCov.out, params.color)
+        plotTotalTranscripts(params.python_file_2, gffreadToFasta.out, canonicalBestCov.out.can_fasta, params.color)
         //----------------------------------------
     }
 
