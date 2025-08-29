@@ -110,6 +110,10 @@ nextflow run anzenker/master_thesis_anzenker_2025 -r main --raw_reads raw_reads.
 *
 
 <a name="pipe_dir"></a>
+#### 4.2.3 ms-pipeline flowchart overview
+[!pipeline_flowchart.png](/images/pipeline_flowchart.png)
+
+<a name="pipe_dir"></a>
 #### 4.2.3 ms-pipeline results directory
 ```
 .
