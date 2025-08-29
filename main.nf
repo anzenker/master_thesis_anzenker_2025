@@ -455,7 +455,7 @@ workflow {
     // 4. awk, python, seqkit
     // generate canonical transcriptome from isoform transcripts with the highest coverage 
     //***************************************
-    params.python_file_5 = file("${projectDir}/python_scripts/4_choose_canonical_transcripts.py")
+    params.python_script_5 = file("${projectDir}/python_scripts/4_choose_canonical_transcripts.py")
     canonicalBestCov(stringtie2Transcriptome.out, gffreadToFasta.out, params.python_script_5)
 
     // create channel from total transcriptome and canonical transcriptome
