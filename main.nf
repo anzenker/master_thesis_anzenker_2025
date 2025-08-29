@@ -10,7 +10,7 @@ params.color = "#C79FEF" //lilac
 params.skip_eggnog = false
 params.skip_busco = false
 params.skip_orf = false
-params.no_plots = false
+params.skip_plots = false
 
 
 def helpMessage() {
@@ -40,7 +40,7 @@ def helpMessage() {
             --skip_eggnog true          Skip EggNOG annotation step
             --skip_orf true             Skip TransDecoder ORF Prediction & eggNOG annotation.stripIndent
             --skip_busco true           Skip BUSCO analysis.
-            --no_plots true             No output plot will be generated.
+            --skip_plots true             No output plot will be generated.
 
         """.stripIndent()
     }
@@ -88,31 +88,6 @@ process buscoVertebrataCompleteness {
     """
 }
 
-process canonicalBestCov {
-    publishDir "${params.outdir}/4_canonical_transcriptome", mode:'copy'
-
-    input: 
-    path input_gtf_file
-    path python_script
-    path input_fasta
-
-    output:
-    path "transcript_ids_and_coverage.tsv", emit: cov_tsv
-    path "canonical_transcript_ids.txt", emit: can_ids
-    path "${input_fasta.baseName}_canonical.fasta", emit: can_fasta
-    
-
-    script:
-    """
-    awk ' BEGIN { OFS="\t" } { if (\$3 == "transcript") {print \$10, \$12, \$14} }' $input_gtf_file | sed 's/[\";"]//g' > transcript_ids_and_coverage.tsv
-
-    python $python_script "transcript_ids_and_coverage.tsv" "canonical_transcript_ids.txt"
-
-    seqkit grep -f "canonical_transcript_ids.txt" $input_fasta -o "${input_fasta.baseName}_canonical.fasta"
-
-    """
-}
-
 process canonicalBestCov1 {
     publishDir "${params.outdir}/4_canonical_transcriptome", mode:'copy'
 
@@ -121,7 +96,6 @@ process canonicalBestCov1 {
 
     output:
     path "transcript_ids_and_coverage.tsv"
-    path "${input_fasta_file.baseName}_canonical_ids.txt"
 
     script:
     """
@@ -200,7 +174,7 @@ process eggnogAnnotation {
 
 process gffreadToFasta {
 
-    publishDir "${params.outdir}/3_gffread_transcriptome", mode:'copy'
+    publishDir "${params.outdir}/3_gffread_transcriptome"
 
     input:
         path input_gtf_file
@@ -239,7 +213,7 @@ process minimap2RawToGenome {
 
 process plotBUSCOCompleteness {
 
-    publishDir "${params.outdir}/8_plots", mode:'copy'
+    publishDir "${params.outdir}/8_plots"
 
     input:
     path python_script
@@ -261,13 +235,13 @@ process plotBUSCOCompleteness {
     # ensure output folder exists
     mkdir -p "busco_plot_${label}"
 
-    python $python_script "${full_table}/run_vertebrata_odb10/full_table.tsv" "$species_name" "busco_plot_${label}"
+    python $python_script "${full_table}/run_vertebrata_odb10/full_table.tsv" $species_name "busco_plot_${label}"
     """
 }
 
 process plotIsoformPerGene {
 
-    publishDir "${params.outdir}/8_plots", mode:'copy'
+    publishDir "${params.outdir}/8_plots"
 
     input:
     path python_script
@@ -288,10 +262,10 @@ process plotIsoformPerGene {
     export XDG_CACHE_HOME="\$PWD/.cache"
     mkdir -p "\$MPLCONFIGDIR" "\$XDG_CACHE_HOME/fontconfig"
 
-    # make output dir expected by your script
-    mkdir -p 2_ipg
+    # ensure output folder exists
+    mkdir -p "2_ipg"
     
-    python $python_script $gtf_input_file 2_ipg -plot_color "$color"
+    python $python_script $gtf_input_file "2_ipg" -plot_color "$color"
     """
 }
 
@@ -319,7 +293,10 @@ process plotORFStatistics {
     export XDG_CACHE_HOME="\$PWD/.cache"
     mkdir -p "\$MPLCONFIGDIR" "\$XDG_CACHE_HOME/fontconfig"
 
-    python $python_script $input_fasta $input_pep -plot_color1 "$plot_color"
+    # ensure output folder exists
+    mkdir -p "5_orf"
+
+    python $python_script $input_fasta $input_pep -plot_color1 "$plot_color" -output_path "5_orf"
     """
 }
 
@@ -346,7 +323,10 @@ process plotTotalTranscripts {
     export XDG_CACHE_HOME="\$PWD/.cache"
     mkdir -p "\$MPLCONFIGDIR" "\$XDG_CACHE_HOME/fontconfig"
 
-    python $python_script $input_fasta_1 $input_fasta_2 --color1 "${plot_color}"
+    # ensure output folder exists
+    mkdir -p "4_total_vs_canonical"
+
+    python $python_script $input_fasta_1 $input_fasta_2 --color1 "${plot_color}" --output_path "4_total_vs_canonical"
     """ 
 }
 
@@ -359,12 +339,13 @@ process plotOverviewQuality {
     path input_gtf
     path input_fasta
     path input_pep
-    tuple path(full_table), val(label)
+    path input_busco
     path input_eggnog
     val species_name
     
     output:
-    path "overview_quality/pipeline_transcriptome_quality_overview_functionality.png"
+    path "overview_quality/transcript_counts_counts.csv"
+    path "overview_quality/transcript_counts_grouped_bar.png"
 
     script:
     """
@@ -375,9 +356,11 @@ process plotOverviewQuality {
     export XDG_CACHE_HOME="\$PWD/.cache"
     mkdir -p "\$MPLCONFIGDIR" "\$XDG_CACHE_HOME/fontconfig"
 
-    mkdir -p overview_quality
+    # ensure output folder exists
+    mkdir -p "overview_plot"
 
-    python $python_script $input_gtf $input_fasta "${input_pep}" "${full_table}/run_vertebrata_odb10/full_table.tsv" $input_eggnog overview_quality --species_name "$species_name"
+
+    python $python_script $input_gtf $input_fasta "${input_pep}/${input_fasta.baseName}.transdecoder_dir/longest_orfs.pep" $input_busco $input_eggnog "overview_plot" --species_name $species_name
     """ 
 }
 
@@ -458,7 +441,7 @@ workflow {
     if (params.skip_orf) {
             log.info "ORF Prediction and EggNOG annotation will be skipped."
         }
-    if (params.no_plots) {
+    if (params.skip_plots) {
             log.info "No plots will be generated."
         }
    
@@ -487,7 +470,7 @@ workflow {
     // reconstruct transcriptome from mapping
     //***************************************
     stringtie2Transcriptome(params.threads, minimap2RawToGenome.out[0])
-    if (!params.no_plots) {
+    if (!params.skip_plots) {
         //----------------------------------------
         // plot isoform per gene
         //def isoform_plot_outdir = "${params.outdir}/8_plots"
@@ -507,30 +490,26 @@ workflow {
     // 4. awk, python, seqkit
     // generate canonical transcriptome from isoform transcripts with the highest coverage 
     //***************************************
-    params.python_file_6 = file("${projectDir}/python_scripts/4_choose_canonical_transcripts.py")
-
-    canonicalBestCov(stringtie2Transcriptome.out, params.python_file_6, gffreadToFasta.out)  
-
-    //canonicalBestCov1(stringtie2Transcriptome.out) //.gtf --> .tsv
-    //canonicalBestCov2(canonicalBestCov1.out, gffreadToFasta.out) //.tsv, .fasta --> .txt
-    //canonicalBestCov3(canonicalBestCov2.out, gffreadToFasta.out) //.txt, .fasta --> .fasta
+    canonicalBestCov1(stringtie2Transcriptome.out) //.gtf --> .tsv
+    canonicalBestCov2(canonicalBestCov1.out, gffreadToFasta.out) //.tsv, .fasta --> .txt
+    canonicalBestCov3(canonicalBestCov2.out, gffreadToFasta.out) //.txt, .fasta --> .fasta
 
     // create channel from total transcriptome and canonical transcriptome
-    transcriptome_ch = gffreadToFasta.out.combine(canonicalBestCov.out.can_fasta).flatten()
+    transcriptome_ch = gffreadToFasta.out.combine(canonicalBestCov3.out).flatten()
 
 
-    if (!params.no_plots) {
+    if (!params.skip_plots) {
         //----------------------------------------
         // plot total transcriptome no all vs canonical 
         params.python_file_2 = "${projectDir}/python_scripts/4_plot_total_vs_canonical_transcript_count.py"
         //def python_script_path_1 = file("${projectDir}/python_scripts/4_plot_total_vs_canonical_transcript_count.py")
-        plotTotalTranscripts(params.python_file_2, gffreadToFasta.out, canonicalBestCov.out.can_fasta, params.color)
+        plotTotalTranscripts(params.python_file_2, gffreadToFasta.out, canonicalBestCov3.out, params.color)
         //----------------------------------------
     }
 
 
     //transcriptome_ch = gffreadToFasta.out
-    //                .combine(canonicalBestCov.out.can_fasta)
+    //                .combine(canonicalBestCov3.out)
     //                .map { a, b -> [a, b] } // ensure list structure
     //                .collectMany { it }    // flatten the list of pairs
     //                .enumerate()           // adds index
@@ -541,14 +520,14 @@ workflow {
         //***************************************
         //5. ORF Prediction
         //***************************************
-        transDecoderORF(canonicalBestCov.out.can_fasta) //.fasta --> longest_orfs.pep
+        transDecoderORF(canonicalBestCov3.out) //.fasta --> longest_orfs.pep
         //----------------------------------------
-        if (!params.no_plots) {
+        if (!params.skip_plots) {
             //----------------------------------------
             // plot ORF category distribution
             params.python_file_3 = "${projectDir}/python_scripts/5_plot_orf_statistics.py"
             //def python_script_path_3 = file("${projectDir}/python_scripts/5_plot_orf_statistics.py")
-            plotORFStatistics(params.python_file_3, canonicalBestCov.out.can_fasta, transDecoderORF.out, params.color)
+            plotORFStatistics(params.python_file_3, canonicalBestCov3.out, transDecoderORF.out, params.color)
             //----------------------------------------
         }   
     }
@@ -565,7 +544,7 @@ workflow {
 
         // build two tuple channels, then merge them
         def total_ch     = gffreadToFasta.out.map     { f -> tuple(f, 'total') }
-        def canonical_ch = canonicalBestCov.out.can_fasta.map  { f -> tuple(f, 'canonical') }
+        def canonical_ch = canonicalBestCov3.out.map  { f -> tuple(f, 'canonical') }
         
         // channel of (path,label) items
         def transcriptome_labeled = total_ch.mix(canonical_ch)
@@ -590,13 +569,13 @@ workflow {
 
     // 8) Overview (only if ALL present)
     if ( !params.no_plots && !params.skip_busco && !params.skip_orf && !params.skip_eggnog ) {
-        params.python_file_5 = "${projectDir}/python_scripts/plot_pipeline_quality_overview_functionality.py"
-        //def overview_py = file("${projectDir}/python_scripts/plot_pipeline_quality_overview_functionality.py")
+        params.python_file_5 = "${projectDir}/python_scripts/plot_pipeline_quality_overview_fucntioanlity.py"
+        //def overview_py = file("${projectDir}/python_scripts/plot_pipeline_quality_overview_fucntioanlity.py")
         // choose which BUSCO channel to feed (e.g., canonical only):
         plotOverviewQuality(
         params.python_file_5,
         stringtie2Transcriptome.out,  // GTF
-        canonicalBestCov.out.can_fasta,           // FASTA
+        canonicalBestCov3.out,           // FASTA
         transDecoderORF.out,          // PEP
         buscoVertebrataCompleteness.out, // full_table.tsv
         eggnogAnnotation.out.hits,         // .annotations
