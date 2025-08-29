@@ -119,7 +119,7 @@ def main():
     p.add_argument("--species3", default=None, help="Species name 3 (optional)")
     p.add_argument("--color3", default=None, help="Hex color for species 3 (optional)")
 
-    p.add_argument("--outout_path", help="Output path/folder")
+    p.add_argument("--output_path", help="Output path/folder")
     args = p.parse_args()
 
     jobs, color_map = [], {}
@@ -146,9 +146,9 @@ def main():
     df = pd.concat(frames, ignore_index=True)
 
     # Save
-    tab_1 = os.path.join(output_path, "4_total_vs_canonical_counts.csv")
+    tab_1 = os.path.join(args.output_path, "4_total_vs_canonical_counts.csv")
     df.to_csv(tab_1, index=False)
-    print(f"Saved table: {counts_csv}")
+    print(f"Saved table: {tab_1}")
 
     plot_transcript_counts(df, args.output_path, color_map)
 
