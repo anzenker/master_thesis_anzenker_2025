@@ -36,7 +36,7 @@ def default_color_for(species: str) -> str:
 
 # ---------- plotting ----------
 
-def plot_transcript_counts(df: pd.DataFrame, out_png: str, color_map: dict):
+def plot_transcript_counts(df: pd.DataFrame, output_path: str, color_map: dict):
     # order species as they appear
     species_order = list(dict.fromkeys(df["Species"].tolist()))
 
@@ -81,9 +81,14 @@ def plot_transcript_counts(df: pd.DataFrame, out_png: str, color_map: dict):
                 ha="center", va="bottom", fontsize=9
         )
     plt.tight_layout()
-    plt.savefig(out_png, dpi=300)
+
+    # Save
+    fig = os.path.join(output_path, "4_plot_total_vs_canonical_counts.png")
+    plt.savefig(fig)
+    print(f"Plot saved to: {fig}")
+
     plt.close()
-    print(f"Saved plot: {out_png}")
+
 
 # ---------- CLI ----------
 
@@ -114,7 +119,7 @@ def main():
     p.add_argument("--species3", default=None, help="Species name 3 (optional)")
     p.add_argument("--color3", default=None, help="Hex color for species 3 (optional)")
 
-    p.add_argument("--out-prefix", default="transcript_counts", help="Output prefix for files")
+    p.add_argument("--outout_path", help="Output path/folder")
     args = p.parse_args()
 
     jobs, color_map = [], {}
@@ -140,12 +145,12 @@ def main():
     frames = [summarize_species_counts(sp, fa, can) for sp, fa, can in jobs]
     df = pd.concat(frames, ignore_index=True)
 
-    counts_csv = f"{args.out_prefix}_counts.csv"
-    df.to_csv(counts_csv, index=False)
+    # Save
+    tab_1 = os.path.join(output_path, "4_total_vs_canonical_counts.csv")
+    df.to_csv(tab_1, index=False)
     print(f"Saved table: {counts_csv}")
 
-    out_png = f"{args.out_prefix}_grouped_bar.png"
-    plot_transcript_counts(df, out_png, color_map)
+    plot_transcript_counts(df, args.output_path, color_map)
 
 if __name__ == "__main__":
     main()
