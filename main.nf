@@ -214,9 +214,9 @@ process plotIsoformPerGene {
     val color
     
     output:
-    path "2_ipg/${gtf_input_file.baseName}_isoform_per_gene_barplot.tsv"
-    path "2_ipg/${gtf_input_file.baseName}_isoform_per_gene_barplot.png"
-    path "2_ipg/${gtf_input_file.baseName}_isoform_per_gene_1_to_15_barplot.png"
+    path "2_ipg/2_isoforms_per_gene.tsv"
+    path "2_ipg/2_isoform_per_gene_barplot.png"
+    path "2_ipg/2_isoform_per_gene_1_to_15_barplot.png"
 
     script:
     """
@@ -245,9 +245,9 @@ process plotORFStatistics {
     val plot_color
 
     output:
-    path "orf_compare_pivot.csv" 
-    path "orf_compare_long.csv"
-    path "orf_compare_grouped_bar.png"
+    path "5_orf/5_orf_statistics_pivot.csv" 
+    path "5_orf/5_orf_statistics_long.csv"
+    path "5_orf/5_plot_orf_statistics.png"
 
     script:
     """
@@ -276,8 +276,8 @@ process plotTotalTranscripts {
     val plot_color
     
     output:
-    path "transcript_counts_counts.csv"
-    path "transcript_counts_grouped_bar.png"
+    path "4_total_vs_canonical/4_total_vs_canonical_counts.csv"
+    path "4_total_vs_canonical/4_plot_total_vs_canonical_counts.png"
 
     script:
     """
@@ -309,8 +309,7 @@ process plotOverviewQuality {
     val species_name
     
     output:
-    path "overview_quality/transcript_counts_counts.csv"
-    path "overview_quality/transcript_counts_grouped_bar.png"
+    path "overview_quality/pipeline_transcriptome_quality_overview_functionality.png"
 
     script:
     """
