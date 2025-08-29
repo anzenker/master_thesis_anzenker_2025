@@ -387,7 +387,7 @@ process plotOverviewQuality {
 
     mkdir -p overview_quality
 
-    python $python_script $input_gtf $input_fasta "${input_pep}" "${full_table}/run_vertebrata_odb10/full_table.tsv" $input_eggnog overview_quality --species_name $species_name
+    python $python_script $input_gtf $input_fasta "${input_pep}" "${full_table}/run_vertebrata_odb10/full_table.tsv" $input_eggnog overview_quality --species_name "$species_name"
     """ 
 }
 
