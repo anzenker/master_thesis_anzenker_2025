@@ -280,9 +280,9 @@ process plotORFStatistics {
     val plot_color
 
     output:
-    path "orf_compare_pivot.csv" 
-    path "orf_compare_long.csv"
-    path "orf_compare_grouped_bar.png"
+    path "5_orf/orf_compare_pivot.csv" 
+    path "5_orf/orf_compare_long.csv"
+    path "5_orf/orf_compare_grouped_bar.png"
 
     script:
     """
@@ -311,8 +311,8 @@ process plotTotalTranscripts {
     val plot_color
     
     output:
-    path "transcript_counts_counts.csv"
-    path "transcript_counts_grouped_bar.png"
+    path "4_total_vs_canonical/transcript_counts_counts.csv"
+    path "4_total_vs_canonical/transcript_counts_grouped_bar.png"
 
     script:
     """
@@ -344,8 +344,8 @@ process plotOverviewQuality {
     val species_name
     
     output:
-    path "overview_quality/transcript_counts_counts.csv"
-    path "overview_quality/transcript_counts_grouped_bar.png"
+    path "overview_plot/transcript_counts_counts.csv"
+    path "overview_plot/transcript_counts_grouped_bar.png"
 
     script:
     """
