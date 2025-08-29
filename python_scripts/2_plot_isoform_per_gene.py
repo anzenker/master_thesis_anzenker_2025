@@ -60,10 +60,10 @@ def extract_isoform_ids_per_gene(transcript_df, filename, output_path):
     # add a count a isoform count column
     grouped_df["isoform_count"] = grouped_df["transcript_id"].apply(len)
 
-    # Save to file
-    output_file = f"{output_path}/{filename}_isoforms_per_gene_overview.tsv"
-    grouped_df.to_csv(output_file, sep="\t", index=False)
-    print(f"Isoform Counts saved to: {output_file}")
+    # Save
+    tab_1 = os.path.join(output_path, "2_isoforms_per_gene.tsv")
+    grouped_df.to_csv(tab_1, sep="\t", index=False)
+    print(f"Isoform Counts saved to: {tab_1}")
 
 
 def plot_isoform_per_gene(transcript_df, plot_color, filename, output_path):
@@ -108,13 +108,10 @@ def plot_isoform_per_gene(transcript_df, plot_color, filename, output_path):
     isoform_dist_df.columns = ["isoform_count", "count_of_genes"]
 
 
-    # save isoform per gene counts into txt file
-    isoform_dist_df.to_csv(
-        os.path.join(output_path, f"{os.path.splitext(filename)[0]}_isoform_per_gene.txt"),
-        # the following option is used in the script used by the nextflow pipeline    
-        #f"{os.path.splitext(filename)[0]}_isoform_per_gene_barplot.txt",
-        sep='\t', index= False
-    )
+    # Save
+    tab_2 = os.path.join(output_path, "4_isoforms_per_gene.txt")
+    isoform_dist_df.to_csv(tab_2, sep="\t", index=False)
+    print(f"Isoform Counts saved to: {tab_2}")
 
     fig, ax = plt.subplots(figsize=(12, 6))
 
@@ -142,7 +139,7 @@ def plot_isoform_per_gene(transcript_df, plot_color, filename, output_path):
     plt.tight_layout()
 
     # Save
-    fig_1 = os.path.join(output_path, f"{os.path.splitext(filename)[0]}_isoform_per_gene_barplot.png")
+    fig_1 = os.path.join(output_path, f"2_isoform_per_gene_barplot.png")
     plt.savefig(fig_1)
     print(f"Plot saved to: {fig_1}")
     #plt.close()
@@ -159,7 +156,7 @@ def plot_isoform_per_gene(transcript_df, plot_color, filename, output_path):
     plt.tight_layout()
 
     # Save
-    fig_2 = os.path.join(output_path, f"{os.path.splitext(filename)[0]}_isoform_per_gene_1_to_15_barplot.png")
+    fig_2 = os.path.join(output_path, f"2_isoform_per_gene_1_to_15_barplot.png")
     plt.savefig(fig_2)
     print(f"Plot saved to: {fig_2}")
     plt.close()
