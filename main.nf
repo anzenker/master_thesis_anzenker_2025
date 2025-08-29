@@ -88,6 +88,31 @@ process buscoVertebrataCompleteness {
     """
 }
 
+process canonicalBestCov {
+    publishDir "${params.outdir}/4_canonical_transcriptome", mode:'copy'
+
+    input: 
+    path input_gtf_file
+    path python_script
+    path input_fasta
+
+    output:
+    path "transcript_ids_and_coverage.tsv", emit: cov_tsv
+    path "canonical_transcript_ids.txt", emit: can_ids
+    path "${input_fasta.baseName}_canonical.fasta", emit: can_fasta
+    
+
+    script:
+    """
+    awk ' BEGIN { OFS="\t" } { if (\$3 == "transcript") {print \$10, \$12, \$14} }' $input_gtf_file | sed 's/[\";"]//g' > transcript_ids_and_coverage.tsv
+
+    python $python_script "transcript_ids_and_coverage.tsv" "canonical_transcript_ids.txt"
+
+    seqkit grep -f "canonical_transcript_ids.txt" $input_fasta -o "${input_fasta.baseName}_canonical.fasta"
+
+    """
+}
+
 process canonicalBestCov1 {
     publishDir "${params.outdir}/4_canonical_transcriptome", mode:'copy'
 
@@ -96,6 +121,7 @@ process canonicalBestCov1 {
 
     output:
     path "transcript_ids_and_coverage.tsv"
+    path "${input_fasta_file.baseName}_canonical_ids.txt"
 
     script:
     """
@@ -491,12 +517,16 @@ workflow {
     // 4. awk, python, seqkit
     // generate canonical transcriptome from isoform transcripts with the highest coverage 
     //***************************************
-    canonicalBestCov1(stringtie2Transcriptome.out) //.gtf --> .tsv
-    canonicalBestCov2(canonicalBestCov1.out, gffreadToFasta.out) //.tsv, .fasta --> .txt
-    canonicalBestCov3(canonicalBestCov2.out, gffreadToFasta.out) //.txt, .fasta --> .fasta
+    params.python_file_6 = file("${projectDir}/python_scripts/4_choose_canonical_transcripts.py")
+
+    canonicalBestCov(stringtie2Transcriptome.out, params.python_file_6, gffreadToFasta.out)  
+
+    //canonicalBestCov1(stringtie2Transcriptome.out) //.gtf --> .tsv
+    //canonicalBestCov2(canonicalBestCov1.out, gffreadToFasta.out) //.tsv, .fasta --> .txt
+    //canonicalBestCov3(canonicalBestCov2.out, gffreadToFasta.out) //.txt, .fasta --> .fasta
 
     // create channel from total transcriptome and canonical transcriptome
-    transcriptome_ch = gffreadToFasta.out.combine(canonicalBestCov3.out).flatten()
+    transcriptome_ch = gffreadToFasta.out.combine(canonicalBestCov.out.can_fasta).flatten()
 
 
     if (!params.no_plots) {
@@ -504,13 +534,13 @@ workflow {
         // plot total transcriptome no all vs canonical 
         params.python_file_2 = "${projectDir}/python_scripts/4_plot_total_vs_canonical_transcript_count.py"
         //def python_script_path_1 = file("${projectDir}/python_scripts/4_plot_total_vs_canonical_transcript_count.py")
-        plotTotalTranscripts(params.python_file_2, gffreadToFasta.out, canonicalBestCov3.out, params.color)
+        plotTotalTranscripts(params.python_file_2, gffreadToFasta.out, canonicalBestCov.out, params.color)
         //----------------------------------------
     }
 
 
     //transcriptome_ch = gffreadToFasta.out
-    //                .combine(canonicalBestCov3.out)
+    //                .combine(canonicalBestCov.out.can_fasta)
     //                .map { a, b -> [a, b] } // ensure list structure
     //                .collectMany { it }    // flatten the list of pairs
     //                .enumerate()           // adds index
@@ -521,14 +551,14 @@ workflow {
         //***************************************
         //5. ORF Prediction
         //***************************************
-        transDecoderORF(canonicalBestCov3.out) //.fasta --> longest_orfs.pep
+        transDecoderORF(canonicalBestCov.out.can_fasta) //.fasta --> longest_orfs.pep
         //----------------------------------------
         if (!params.no_plots) {
             //----------------------------------------
             // plot ORF category distribution
             params.python_file_3 = "${projectDir}/python_scripts/5_plot_orf_statistics.py"
             //def python_script_path_3 = file("${projectDir}/python_scripts/5_plot_orf_statistics.py")
-            plotORFStatistics(params.python_file_3, canonicalBestCov3.out, transDecoderORF.out, params.color)
+            plotORFStatistics(params.python_file_3, canonicalBestCov.out.can_fasta, transDecoderORF.out, params.color)
             //----------------------------------------
         }   
     }
@@ -545,7 +575,7 @@ workflow {
 
         // build two tuple channels, then merge them
         def total_ch     = gffreadToFasta.out.map     { f -> tuple(f, 'total') }
-        def canonical_ch = canonicalBestCov3.out.map  { f -> tuple(f, 'canonical') }
+        def canonical_ch = canonicalBestCov.out.can_fasta.map  { f -> tuple(f, 'canonical') }
         
         // channel of (path,label) items
         def transcriptome_labeled = total_ch.mix(canonical_ch)
@@ -576,7 +606,7 @@ workflow {
         plotOverviewQuality(
         params.python_file_5,
         stringtie2Transcriptome.out,  // GTF
-        canonicalBestCov3.out,           // FASTA
+        canonicalBestCov.out.can_fasta,           // FASTA
         transDecoderORF.out,          // PEP
         buscoVertebrataCompleteness.out, // full_table.tsv
         eggnogAnnotation.out.hits,         // .annotations
