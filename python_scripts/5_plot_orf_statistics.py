@@ -53,7 +53,7 @@ def summarize_species_row(species: str, fasta: str, pep: str):
 
 # ---------- plotting ----------
 
-def plot_grouped_from_pivot(pivot_df: pd.DataFrame, colors_map: dict, out_png: str):
+def plot_grouped_from_pivot(pivot_df: pd.DataFrame, colors_map: dict, output_path: str):
     """
     pivot_df:   index = category ('with_orf','complete','5partial','3partial','internal')
                 columns = species
@@ -98,7 +98,12 @@ def plot_grouped_from_pivot(pivot_df: pd.DataFrame, colors_map: dict, out_png: s
                 
     plt.xticks(rotation=0)
     plt.tight_layout()
-    plt.savefig(out_png, dpi=300)
+
+    # Save
+    fig = os.path.join(output_path, "5_plot_orf_statistics.png")
+    plt.savefig(fig)
+    print(f"Plot saved to: {fig}")
+
     plt.close()
 
 def default_color_for(species: str) -> str:
@@ -170,21 +175,19 @@ def main():
     percent_pivot.loc["total_transcripts"] = 100.0
     percent_pivot = percent_pivot.round(2)
 
-
-    # save tables
-    out_pivot_csv = f"{args.out_prefix}_pivot.csv"
-    out_long_csv  = f"{args.out_prefix}_long.csv"
-    pivot.to_csv(out_pivot_csv)
-    long_df.to_csv(out_long_csv, index=False)
+    # Save
+    tab_1 = os.path.join(args.output_path, "5_orf_statistics_pivot.csv")
+    tab_2 = os.path.join(args.output_path, "5_orf_statistics_long.csv")
+    pivot.to_csv(tab_1)
+    long_df.to_csv(tab_2, index=False)
+    print(f"Tables saved to: {tab_1} & {tab_2}")
 
     # plot grouped bars from pivot
-    out_png = f"{args.out_prefix}_grouped_bar.png"
-    plot_grouped_from_pivot(pivot, color_map, out_png)
+    plot_grouped_from_pivot(pivot, color_map, args.output_path)
 
     print("=== Pivot table (categories x specie(s)) ===")
     print(pivot)
     print(percent_pivot)
-    print(f"\nSaved: {out_pivot_csv}, {out_long_csv}, {out_png}")
 
 
 if __name__ == "__main__":
@@ -200,19 +203,19 @@ if __name__ == "__main__":
     parser.add_argument("input_pep1", help="Path to TransDecoder PEP file")
     parser.add_argument("-species_name1", help="Name of the species")
     #the following are optional user inputs
-    parser.add_argument("-plot_color1", default=None, help="Color for plotting in hex code")
+    parser.add_argument("-plot_color1", help="Color for plotting in hex code")
     # optional species 2
-    parser.add_argument("-input_fasta2", default=None, help="Path to Transcriptome FASTA file")
-    parser.add_argument("-input_pep2", default=None, help="Path to TransDecoder PEP file")
-    parser.add_argument("-species_name2", default=None, help="Name of the species")
-    parser.add_argument("-plot_color2", default=None, help="Color for plotting in hex code, default") 
+    parser.add_argument("-input_fasta2", help="Path to Transcriptome FASTA file")
+    parser.add_argument("-input_pep2", help="Path to TransDecoder PEP file")
+    parser.add_argument("-species_name2", help="Name of the species")
+    parser.add_argument("-plot_color2", help="Color for plotting in hex code, default") 
     # optional species 3
-    parser.add_argument("-input_fasta3", default=None, help="Path to Transcriptome FASTA file")
-    parser.add_argument("-input_pep3", default=None, help="Path to TransDecoder PEP file")
-    parser.add_argument("-species_name3", default=None, help="Name of the species")
-    parser.add_argument("-plot_color3", default=None, help="Color for plotting in hex code, default")  
+    parser.add_argument("-input_fasta3", help="Path to Transcriptome FASTA file")
+    parser.add_argument("-input_pep3", help="Path to TransDecoder PEP file")
+    parser.add_argument("-species_name3", help="Name of the species")
+    parser.add_argument("-plot_color3", help="Color for plotting in hex code, default")  
     #optional file prefix
-    parser.add_argument("--out-prefix", default="orf_compare") 
+    parser.add_argument("-output_path", help="Output path/folder") 
 
     args = parser.parse_args()
 
