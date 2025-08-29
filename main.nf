@@ -200,7 +200,7 @@ process eggnogAnnotation {
 
 process gffreadToFasta {
 
-    publishDir "${params.outdir}/3_gffread_transcriptome"
+    publishDir "${params.outdir}/3_gffread_transcriptome", mode:'copy'
 
     input:
         path input_gtf_file
@@ -238,10 +238,8 @@ process minimap2RawToGenome {
 }
 
 process plotBUSCOCompleteness {
-    when:
-        !params.no_plots
 
-    publishDir "${params.outdir}/8_plots"
+    publishDir "${params.outdir}/8_plots", mode:'copy'
 
     input:
     path python_script
@@ -268,10 +266,8 @@ process plotBUSCOCompleteness {
 }
 
 process plotIsoformPerGene {
-    when:
-        !params.no_plots
 
-    publishDir "${params.outdir}/8_plots"
+    publishDir "${params.outdir}/8_plots", mode:'copy'
 
     input:
     path python_script
@@ -300,8 +296,6 @@ process plotIsoformPerGene {
 }
 
 process plotORFStatistics {
-    when:
-        !params.no_plots
 
     publishDir "${params.outdir}/8_plots", mode: 'copy'
 
@@ -330,8 +324,6 @@ process plotORFStatistics {
 }
 
 process plotTotalTranscripts {
-    when:
-        !params.no_plots
 
     publishDir "${params.outdir}/8_plots", mode: 'copy'
 
@@ -359,8 +351,6 @@ process plotTotalTranscripts {
 }
 
 process plotOverviewQuality {
-    when:
-        !params.no_plots
 
     publishDir "${params.outdir}/8_plots", mode: 'copy'
 
