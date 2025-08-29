@@ -14,7 +14,7 @@
 <a name="pod5"></a>
 ## 1. [pod5](https://pod5-file-format.readthedocs.io/en/latest/)
 POD5 is a file format developed by Oxford Nanopore (ONT) to store raw nanopore sequencing data. Data is stored using Apache Arrow. 
-In this project pod5 files are the direct ouput from ONT sequecing runs and are used as input for basecalling to generate unaligned BAM (uBAM) files.
+In this project, pod5 files are the direct output from ONT sequencing runs and are used as input for basecalling to generate unaligned BAM (uBAM) files.
 
 <a name="ubam"></a>
 ## 2. [uBAM](https://gatk.broadinstitute.org/hc/en-us/articles/360035532132-uBAM-Unmapped-BAM-Format)
@@ -54,7 +54,7 @@ The PEP file contains predicted protein sequences (in FASTA format) that TransDe
 - Protein Seqeunces (Amino Acids), representing the translated ORF
 
 **Examplary PEP file from TransDecoder output:**
-![TransDecoder PEP output](images/TransDecoder_pep_output.png)
+![TransDecoder PEP output](/images/TransDecoder_pep_output.png)
 
 <a name="gtf"></a>
 ## 6. [GTF](https://www.ensembl.org/info/website/upload/gff.html)
@@ -71,7 +71,7 @@ Mandatory fields are (descriptions from (https://www.ensembl.org/info/website/up
 - **9 attribute** - a semicolon-separated list, providing additional information, e.g.  to a 'gene_id', isoform number as 'transcript_id', 'exon_number' of the transcript, 'cov' coverage of the feature 
 
 **Examplary GTF file from stringtie2 output:**
-![stringtie2 GTF output](images/stringtie2_output.png)
+![stringtie2 GTF output](/images/stringtie2_output.png)
 
 <a name="blast_out"></a>
 ## 6. [BLAST tabular output format (outfmt6) ](https://www.ncbi.nlm.nih.gov/books/NBK279684/table/appendices.T.options_common_to_all_blast/)
@@ -90,4 +90,4 @@ Tabular output of alignment view. The default columns are:
 - **12 bitscore** - bit score
 
 **Examplary outfmt6 file from blastp output:**
-![blastp outfmt6 output](images/blastp_outfmt6_output.png)
+![blastp outfmt6 output](/images/blastp_outfmt6_output.png)
