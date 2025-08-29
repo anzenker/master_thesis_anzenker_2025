@@ -25,7 +25,7 @@ The BAM (Binary Alignment/Map) format is the compressed binary version of the SA
 
 ### 2.1 [SAM](https://samtools.github.io/hts-specs/SAMv1.pdf)
 The SAM (Sequence Alignment/Map format) file is a TAB-delimited text format consisting of an optional header ('@') and alignment section. Each alignment section has 11 mandatory fields:
-![SAM madatory fields](images/SAM_mandatory_fields.png)
+![SAM madatory fields](/images/SAM_mandatory_fields.png)
 
 <a name="fasta"></a>
 ## 3. [FASTA](https://rnnh.github.io/bioinfo-notebook/docs/file_formats.html)
