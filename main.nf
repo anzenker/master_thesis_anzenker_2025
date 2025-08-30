@@ -200,7 +200,7 @@ process plotBUSCOCompleteness {
     # ensure output folder exists
     mkdir -p "busco_plot_${label}"
 
-    python $python_script "${full_table}/run_vertebrata_odb10/full_table.tsv" $species_name "busco_plot_${label}"
+    python $python_script "${full_table}/run_vertebrata_odb10/full_table.tsv" "$species_name" "busco_plot_${label}"
     """
 }
 
