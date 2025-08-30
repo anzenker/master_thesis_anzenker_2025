@@ -524,8 +524,8 @@ workflow {
 
     // 8) Overview (only if ALL present)
     if ( !params.skip_plots && !params.skip_busco && !params.skip_orf && !params.skip_eggnog ) {
-        params.python_file_5 = "${projectDir}/python_scripts/plot_pipeline_quality_overview_fucntioanlity.py"
-        //def overview_py = file("${projectDir}/python_scripts/plot_pipeline_quality_overview_fucntioanlity.py")
+        params.python_file_5 = "${projectDir}/python_scripts/plot_pipeline_quality_overview_functionality.py"
+        //def overview_py = file("${projectDir}/python_scripts/plot_pipeline_quality_overview_functionality.py")
         // choose which BUSCO channel to feed (e.g., canonical only):
         plotOverviewQuality(
         params.python_file_5,
