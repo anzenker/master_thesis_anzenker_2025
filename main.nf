@@ -204,7 +204,7 @@ process plotBUSCOCompleteness {
     """
 }
 
-process plotIsoformPerGene {
+process plotIsoforme {
 
     publishDir "${params.outdir}/8_plots"
 
@@ -304,7 +304,7 @@ process plotOverviewQuality {
     path input_gtf
     path input_fasta
     path input_pep
-    path input_busco
+    tuple path(full_table), val(label)
     path input_eggnog
     val species_name
     
@@ -324,7 +324,7 @@ process plotOverviewQuality {
     mkdir -p "overview_plot"
 
 
-    python $python_script $input_gtf $input_fasta "${input_pep}/${input_fasta.baseName}.transdecoder_dir/longest_orfs.pep" $input_busco $input_eggnog "overview_plot" --species_name $species_name
+    python $python_script $input_gtf $input_fasta "${input_pep}/${input_fasta.baseName}.transdecoder_dir/longest_orfs.pep" "${full_table}/run_vertebrata_odb10/full_table.tsv" $input_eggnog "overview_plot" --species_name "$species_name"
     """ 
 }
 
@@ -506,7 +506,7 @@ workflow {
 
         buscoVertebrataCompleteness(params.threads, transcriptome_labeled, busco_downloads_path)
 
-        plotBUSCOCompleteness(params.python_file_4, buscoVertebrataCompleteness.out,   // tuple: (busco_full_table_<label>.tsv, label)
+        plotBUSCOCompleteness(params.python_file_4, buscoVertebrataCompleteness.out, 
                                 params.species_name ?: 'Species'
         )
         }
@@ -532,8 +532,8 @@ workflow {
         stringtie2Transcriptome.out,  // GTF
         canonicalBestCov.out.can_fasta,           // FASTA
         transDecoderORF.out,          // PEP
-        buscoVertebrataCompleteness.out, // full_table.tsv
-        eggnogAnnotation.out.hits,         // .annotations
+        buscoVertebrataCompleteness.out, // tuple
+        eggnogAnnotation.out.hits,         
         params.species_name ?: 'Species'
         )
 
