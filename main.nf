@@ -309,7 +309,7 @@ process plotOverviewQuality {
     val species_name
     
     output:
-    path "overview_quality/pipeline_transcriptome_quality_overview_functionality.png"
+    path "overview_plot/pipeline_transcriptome_quality_overview_functionality.png"
 
     script:
     """
