@@ -204,7 +204,7 @@ process plotBUSCOCompleteness {
     """
 }
 
-process plotIsoforme {
+process plotIsoformPerGene {
 
     publishDir "${params.outdir}/8_plots"
 
