@@ -522,6 +522,9 @@ workflow {
 
      } 
 
+     // select only the 'canonical' BUSCO result
+     def canonical_busco = buscoVertebrataCompleteness.out.filter { table, label -> label == 'canonical' }
+
     // 8) Overview (only if ALL present)
     if ( !params.skip_plots && !params.skip_busco && !params.skip_orf && !params.skip_eggnog ) {
         params.python_file_5 = "${projectDir}/python_scripts/plot_pipeline_quality_overview_functionality.py"
@@ -532,7 +535,7 @@ workflow {
         stringtie2Transcriptome.out,  // GTF
         canonicalBestCov.out.can_fasta,           // FASTA
         transDecoderORF.out,          // PEP
-        buscoVertebrataCompleteness.out, // tuple
+        canonical_busco, // tuple
         eggnogAnnotation.out.hits,         
         params.species_name ?: 'Species'
         )
