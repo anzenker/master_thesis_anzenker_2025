@@ -324,7 +324,7 @@ process plotOverviewQuality {
     mkdir -p "overview_plot"
 
 
-    python $python_script $input_gtf $input_fasta "${input_pep}/${input_fasta.baseName}.transdecoder_dir/longest_orfs.pep" "${full_table}/run_vertebrata_odb10/full_table.tsv" $input_eggnog "overview_plot" --species_name "$species_name"
+    python $python_script $input_gtf $input_fasta $input_pep "${full_table}/run_vertebrata_odb10/full_table.tsv" $input_eggnog "overview_plot" --species_name "$species_name"
     """ 
 }
 
