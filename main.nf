@@ -531,7 +531,7 @@ workflow {
         plotOverviewQuality(
         params.python_file_5,
         stringtie2Transcriptome.out,  // GTF
-        canonicalBestCov.out.can_fasta,           // FASTA
+        canonicalBestCov.out.can_ids,           // FASTA
         transDecoderORF.out,          // PEP
         canonical_busco, // tuple
         eggnogAnnotation.out.hits,         
