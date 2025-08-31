@@ -115,8 +115,6 @@ process canonicalBestCov {
 
 
 process eggnogAnnotation {
-    //when:
-    //!params.skip_eggnog
 
     publishDir "${params.outdir}/7_eggnog_annotation", mode:'copy'
 
@@ -139,7 +137,7 @@ process eggnogAnnotation {
 
 process gffreadToFasta {
 
-    publishDir "${params.outdir}/3_gffread_transcriptome"
+    publishDir "${params.outdir}/3_gffread_transcriptome", mode:'copy'
 
     input:
         path input_gtf_file
@@ -178,7 +176,7 @@ process minimap2RawToGenome {
 
 process plotBUSCOCompleteness {
 
-    publishDir "${params.outdir}/8_plots"
+    publishDir "${params.outdir}/8_plots", mode:'copy'
 
     input:
     path python_script
@@ -206,7 +204,7 @@ process plotBUSCOCompleteness {
 
 process plotIsoformPerGene {
 
-    publishDir "${params.outdir}/8_plots"
+    publishDir "${params.outdir}/8_plots", mode:'copy'
 
     input:
     path python_script
