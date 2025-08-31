@@ -184,7 +184,7 @@ process plotBUSCOCompleteness {
     val species_name
 
     output:
-    path "busco_plot_${label}/6_busco_completeness_stacked_barplot.png"
+    path "6_busco_plot_${label}/6_busco_completeness_stacked_barplot.png"
 
     script:
     """
@@ -196,9 +196,9 @@ process plotBUSCOCompleteness {
     mkdir -p "\$MPLCONFIGDIR" "\$XDG_CACHE_HOME/fontconfig"
 
     # ensure output folder exists
-    mkdir -p "busco_plot_${label}"
+    mkdir -p "6_busco_plot_${label}"
 
-    python $python_script "${full_table}/run_vertebrata_odb10/full_table.tsv" "$species_name" "busco_plot_${label}"
+    python $python_script "${full_table}/run_vertebrata_odb10/full_table.tsv" "$species_name" "6_busco_plot_${label}"
     """
 }
 
