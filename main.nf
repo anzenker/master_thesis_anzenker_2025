@@ -43,7 +43,7 @@ def helpMessage() {
             --skip_plots true             No output plot will be generated.
 
         """.stripIndent()
-    }
+}
 
 
 /*
@@ -380,20 +380,22 @@ process uniprotAnnotation {
 }
 
 process FETCH_TEST_DATA {
-  tag "$name"
-  publishDir 'test_inputs', mode: 'copy'
-  input:
+    tag "$name"
+    publishDir 'test_inputs', mode: 'copy'
+    
+    input:
     tuple val(name), val(url)
-  output:
+
+    output:
     path "test_inputs/${name}"
-  script:
-  """
-  mkdir -p test_inputs
-  curl -L -o test_inputs/${name} ${url}
-  """
+    script:
+    """
+    mkdir -p test_inputs
+    curl -L -o test_inputs/${name} ${url}
+    """
 }
 
-workflow RUN(raw_path, genome_path ){
+workflow RUN(raw_path, genome_path){
 
     // show help message and exit
     if (params.help){
@@ -401,10 +403,10 @@ workflow RUN(raw_path, genome_path ){
         exit 0
     }
     // parameter check
-    if (raw_path) {
+    if (!raw_path) {
         exit 1, "Missing paramter: --raw_reads"
     }
-    if (genome_path){
+    if (!genome_path){
         exit 1, "Missing parameter: --genome"
     }
     if (params.skip_eggnog) {
@@ -419,7 +421,7 @@ workflow RUN(raw_path, genome_path ){
     if (params.skip_plots) {
             log.info "No plots will be generated."
         }
-   
+
     // pipeline run info
     log.info "==========PIPELINE START=========="
     def summary = [:]
@@ -533,7 +535,7 @@ workflow RUN(raw_path, genome_path ){
         def eggnog_db_path = file("${launchDir}/bin/")
         eggnogAnnotation(transDecoderORF.out, params.threads, eggnog_db_path) //.pep, threads no., path --> .hits, .annotation, .seed_orthologs
 
-     } 
+    } 
 
 
     // 8) Overview (only if ALL present)
@@ -561,23 +563,21 @@ workflow RUN(raw_path, genome_path ){
 }
 
 workflow {
-  RUN(file(params.raw_reads), file(params.genome) )
+    RUN(file(params.raw_reads), file(params.genome))
 }
 
-
-
 workflow test {
-  def items = Channel.of(
+    def items = Channel.of(
     tuple('raw.fastq.gz',   params.raw_reads),
     tuple('Chr_test.fa.gz', params.genome)
-  )
+    )
 
-  def fetched = FETCH_TEST_DATA(items).out
-  def RAW = fetched.filter { it.name == 'Chr_raw_reads_testdata.fastq.gz' }
-  def GEN = fetched.filter { it.name == 'Chr_test.fa' }
+    def fetched = FETCH_TEST_DATA(items).out
+    def RAW = fetched.filter { it.name == 'Chr_raw_reads_testdata.fastq.gz' }
+    def GEN = fetched.filter { it.name == 'Chr_test.fa' }
 
   // pass the channels/paths to main — now the dependency is explicit
-  RUN(RAW, GEN)
+    RUN(RAW, GEN)
 }
 
 
