@@ -13,7 +13,7 @@
       + 3.2.4 [ ms-pipeline results directory (dict) ](#dict)
       + 3.2.5 [ Code implemented into the nanoTome pipeline (code) ](#code)
     + 3.3 [ Additional Annoation with BLAST (addanno) ](#addanno)
-      + [ 3.3.1 UniProt annotation (uniprot) ] (#uniprot)
+      + 3.3.1 [ UniProt annotation (uniprot) ] (#uniprot)
  4. [ Some file formats explained ](#file-formats)
  5. [ Links to software tools for manual installation (soft)](#soft)
  6. [ Some extra commands ](#extra)
