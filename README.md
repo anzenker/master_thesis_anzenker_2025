@@ -20,7 +20,7 @@
  7. [ Abbreviations ](#abbrev)
 ###### ================================================================================
 
-###### ----------------------------------------------------------------------------------------------------------------------------------------
+###### -------------------------------------------------------------------------------------------------------------------------
 <a name="rep"></a>
 ## 1. This Repository
 This repository provides a step-by-step guide for assembling and annotating a transcriptome from Oxford Nanopore direct RNA sequencing (dRNA-seq) data using a reference genome. It includes an initial functional assessment of the transcriptome, laying the foundation for reproducible analyses across different tissues, species, and replicates.
@@ -30,14 +30,14 @@ This guide is separated into 3 Parts:
 2. ms-pipeline: Transcriptome Assembly & Functional Assessment
 3. Additional Annotation via BLAST/UniProt
 
-###### ----------------------------------------------------------------------------------------------------------------------------------------
+###### -------------------------------------------------------------------------------------------------------------------------
 <a name="OS"></a>
 ## 2. Hardware and Operating System 
 All steps except dorado basecalling were successfully executed on Linux-based systems with an x86_64 architecture.
 
 Dorado basecalling was executed on Linux-based systems (x86_64) equipped either with NVIDIA RTX 6000 Ada Generation or NVIDIA Tesla V100-DGXS-32GB GPUs.
 
-###### ----------------------------------------------------------------------------------------------------------------------------------------
+###### -------------------------------------------------------------------------------------------------------------------------
 <a name="guide"></a>
 ## 3. Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data
 
@@ -207,17 +207,17 @@ blastp -query transdecoder_dir/longest_orfs.pep  \
     -outfmt 6 -evalue 1e-5 -num_threads 10 > blastp.outfmt6
 ```
 
-###### ----------------------------------------------------------------------------------------------------------------------------------------
+###### -------------------------------------------------------------------------------------------------------------------------
 <a name="file-formats"></a>
 ## 4. Some file formats explained
 Some file formats used to analyse the data are explained in  [file_formats.md](/docs/file_formats.md).
 
-###### ----------------------------------------------------------------------------------------------------------------------------------------
+###### -------------------------------------------------------------------------------------------------------------------------
 <a name="soft"></a>
 ## 5. Links to software tools for manual installation
 [software_links.md](/docs/software_links.md)
 
-###### ----------------------------------------------------------------------------------------------------------------------------------------
+###### -------------------------------------------------------------------------------------------------------------------------
 <a name="extra"></a>
 ## 6. Some extra commands
 Command to check stats in a .fasta or .fastq file:
@@ -225,7 +225,7 @@ Command to check stats in a .fasta or .fastq file:
 seqkit stats *.fasta
 ```
 
-###### ----------------------------------------------------------------------------------------------------------------------------------------
+###### -------------------------------------------------------------------------------------------------------------------------
 <a name="abbrev"></a>
 ## 7. Abbreviations
 - ONT   Oxford Nanopore
