@@ -2,22 +2,22 @@
 
 ###### ================================================================================
 ###### OVERVIEW
-## 1. [ This Repository ](#rep)
-## 2. [ Hardware and Operating System ](#OS)
-## 3. [ Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data ](#guide)
-###    + 3.1 [ Basecalling & Preprocessing ](#prepros)
-###    + 3.2 [ ms-pipeline (Master Thesis Pipeline) (ms-pipeline) ](#ms-pipeline)
-####      + 3.2.1 [ Installation Requirements (install) ](#install)
-####      + 3.2.2 [ Run the ms-pipeline (run) ](#run)
-####      + 3.2.3 [ ms-pipeline flowchart overview (flowchart) ](#flowchart)
-####      + 3.2.4 [ ms-pipeline results directory (dict) ](#dict)
-####      + 3.2.5 [ Code implemented into the nanoTome pipeline (code) ](#code)
-###    + 3.3 [ Additional Annoation with BLAST (addanno) ](#addanno)
-####      + [ 3.3.1 UniProt annotation (uniprot) ] (#uniprot)
-## 4. [ Some file formats explained ](#file-formats)
-## 5. [ Links to software tools for manual installation (soft)](#soft)
-## 6. [ Some extra commands ](#extra)
-## 7. [ Abbreviations ](#abbrev)
+ 1. [ This Repository ](#rep)
+ 2. [ Hardware and Operating System ](#OS)
+ 3. [ Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data ](#guide)
+    + 3.1 [ Basecalling & Preprocessing ](#prepros)
+    + 3.2 [ ms-pipeline (Master Thesis Pipeline) (ms-pipeline) ](#ms-pipeline)
+      + 3.2.1 [ Installation Requirements (install) ](#install)
+      + 3.2.2 [ Run the ms-pipeline (run) ](#run)
+      + 3.2.3 [ ms-pipeline flowchart overview (flowchart) ](#flowchart)
+      + 3.2.4 [ ms-pipeline results directory (dict) ](#dict)
+      + 3.2.5 [ Code implemented into the nanoTome pipeline (code) ](#code)
+    + 3.3 [ Additional Annoation with BLAST (addanno) ](#addanno)
+      + [ 3.3.1 UniProt annotation (uniprot) ] (#uniprot)
+ 4. [ Some file formats explained ](#file-formats)
+ 5. [ Links to software tools for manual installation (soft)](#soft)
+ 6. [ Some extra commands ](#extra)
+ 7. [ Abbreviations ](#abbrev)
 ###### ================================================================================
 
 <a name="rep"></a>
