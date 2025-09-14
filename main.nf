@@ -388,6 +388,7 @@ process FETCH_TEST_DATA {
 
     output:
     path "test_inputs/${name}"
+    
     script:
     """
     mkdir -p test_inputs
@@ -406,13 +407,13 @@ workflow {
 workflow test {
     // Items come from nextflow.config profile "test"
     def items = Channel.of(
-    tuple('raw.fastq.gz',   params.raw_reads),
-    tuple('genome.fa',      params.genome)
+    tuple('Chr_raw_reads_testdata.fastq.gz',   params.raw_reads),
+    tuple('Chr_test.fa',      params.genome)
     )
 
-    def fetched = FETCH_TEST_DATA(items).out
-    def RAW = fetched.filter { it.name == 'raw.fastq.gz' }
-    def GEN = fetched.filter { it.name == 'genome.fa' }
+    def fetched = FETCH_TEST_DATA.out
+    def RAW = fetched.filter { it.name == 'Chr_raw_reads_testdata.fastq.gz' }
+    def GEN = fetched.filter { it.name == 'Chr_test.fa' }
 
     RUN(RAW, GEN)   // RAW/GEN are paths (ok), or channels of single paths (also ok)
 }
