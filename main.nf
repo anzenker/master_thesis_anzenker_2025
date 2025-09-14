@@ -420,8 +420,8 @@ workflow test {
 
 workflow RUN {
     take:
-    path raw_path
-    path genome_path
+    raw_path
+    genome_path
 
     main:
     // show help message and exit
