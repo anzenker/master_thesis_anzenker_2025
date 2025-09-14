@@ -379,7 +379,21 @@ process uniprotAnnotation {
     """
 }
 
-process FETCH_TEST_DATA {
+process FETCH_READS {
+  tag "$name"
+  publishDir 'test_inputs', mode: 'copy'
+  input:
+    tuple val(name), val(url)
+  output:
+    path "test_inputs/${name}"
+  script:
+  """
+  mkdir -p test_inputs
+  curl -L -o test_inputs/${name} ${url}
+  """
+}
+
+process FETCH_GENOME {
   tag "$name"
   publishDir 'test_inputs', mode: 'copy'
   input:
@@ -576,8 +590,8 @@ workflow test {
   def genomeName = 'Chr_test.fa.gz'
 
   // download the two artifacts
-  def raw_dl    = FETCH_TEST_DATA( Channel.value(tuple(rawName,    params.raw_reads)) ).out
-  def genome_dl = FETCH_TEST_DATA( Channel.value(tuple(genomeName, params.genome))    ).out
+  def raw_dl    = FETCH_READS( Channel.value(tuple(rawName,    params.raw_reads)) ).out
+  def genome_dl = FETCH_GENOME( Channel.value(tuple(genomeName, params.genome))    ).out
 
   // set params to the freshly-downloaded local files (single values)
   params.raw_reads = file("test_inputs/${rawName}")
