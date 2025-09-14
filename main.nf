@@ -395,6 +395,29 @@ process FETCH_TEST_DATA {
     """
 }
 
+workflow {
+    if (params.help) { helpMessage(); exit 0 }
+    if (!params.raw_reads) exit 1, "Missing parameter: --raw_reads"
+    if (!params.genome)    exit 1, "Missing parameter: --genome"
+
+    RUN( file(params.raw_reads), file(params.genome) )
+}
+
+workflow test {
+    // Items come from nextflow.config profile "test"
+    def items = Channel.of(
+    tuple('raw.fastq.gz',   params.raw_reads),
+    tuple('genome.fa',      params.genome)
+    )
+
+    def fetched = FETCH_TEST_DATA(items).out
+    def RAW = fetched.filter { it.name == 'raw.fastq.gz' }
+    def GEN = fetched.filter { it.name == 'genome.fa' }
+
+    RUN(RAW, GEN)   // RAW/GEN are paths (ok), or channels of single paths (also ok)
+}
+
+
 workflow RUN {
     take:
     path raw_path
@@ -566,26 +589,5 @@ workflow RUN {
 
 }
 
-workflow {
-    if (params.help) { helpMessage(); exit 0 }
-    if (!params.raw_reads) exit 1, "Missing parameter: --raw_reads"
-    if (!params.genome)    exit 1, "Missing parameter: --genome"
-
-    RUN( file(params.raw_reads), file(params.genome) )
-}
-
-workflow test {
-    // Items come from nextflow.config profile "test"
-    def items = Channel.of(
-    tuple('raw.fastq.gz',   params.raw_reads),
-    tuple('genome.fa',      params.genome)
-    )
-
-    def fetched = FETCH_TEST_DATA(items).out
-    def RAW = fetched.filter { it.name == 'raw.fastq.gz' }
-    def GEN = fetched.filter { it.name == 'genome.fa' }
-
-    RUN(RAW, GEN)   // RAW/GEN are paths (ok), or channels of single paths (also ok)
-}
 
 
