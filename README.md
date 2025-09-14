@@ -45,11 +45,19 @@ Basecalling and Preprocessing can be accomplished in different approaches. A use
 <a name="ms-pipeline"></a>
 ## 3.2. ms-pipeline (Master Thesis Pipeline)
 
-The ms-pipeline is designed to assemble transcriptomes from Oxford Nanopore Technologies (ONT) direct RNA sequencing (dRNA-seq) data, using a reference genome as a guide.
+The ms-pipeline is designed to assemble and annotate transcriptomes from Oxford Nanopore Technologies (ONT) direct RNA sequencing (dRNA-seq) data, using a reference genome as a guide. 
 
-It combines steps for reconstructing the transcriptome (stringtie2), evaluating its completeness with BUSCO Vertebrata, predicting Open Reading Frames (TransDecoder) and performing functional annotation with eggNOG. By this, the workflow provides a reproducible and user-friendly solution that saves time for assessing the quality and completeness of the assembled Transcriptome from dRNA-seq data for further downstream analyses.
+It integrates several key steps:	
+•	Transcriptome reconstruction with StringTie2,	
+•	Completeness assessment with BUSCO Vertebrata to evaluate the presence of conserved orthologs,	
+•	Open Reading Frame (ORF) prediction with TransDecoder to identify whether transcripts encode complete or partial proteins, and	
+•	Functional annotation with eggNOG to provide an initial overview of transcriptome functionality. 
 
-The ms-pipeline originates from a Master Thesis project studying hybridization effects in the parthenogenetic species *Aspidoscelis (A.) neomexicanus* and its sexual parental species, *A. marmoratus* and *A. arizonae*. Since assembling a single transcriptome involves more than one time-consuming step, the aim was to combine and automate most of the process for efficient analysis of multiple tissue samples and species. The pipeline enables quicker and standardized transcriptome assembly and its functional assessment, preparing the data for subsequent analyses.
+Together, this pipeline delivers an assembled transcriptome and a first functional assessment (vertebrata orthologs, coding potential, and functional content). 
+
+The ms-pipeline thereby offers a reproducible and user-friendly workflow for assembling and assessing transcriptomes generated from ONT dRNA-seq data and directly placing them into a functional context. 
+
+The ms-pipeline originates from a Master’s thesis project studying hybridization effects in the parthenogenetic species *Aspidoscelis (A.) neomexicanus* and its sexual parental species, *A. marmoratus* and *A. arizonae*. Since assembling a single transcriptome involves more than one time-consuming step, the aim was to combine and automate most of the process for efficient analysis of multiple tissue samples, species, and replicates. The pipeline enables quicker and standardized transcriptome assembly and functional assessment, preparing the data for subsequent analyses.
 
 <a name="install"></a>
 ### 3.2.1 Installation Requirements
@@ -150,7 +158,7 @@ An exemplary description of the output files and output plots can be found here:
 ```
 
 <a name="code"></a>
-### 3.2.5 Code implemented into the nanoTome pipeline
+### 3.2.5 Code implemented into the ms-pipeline
 All code implemented into the pipeline can be found in [commands.md](/docs/commands.md) for manual execution.
 
 <a name="addanno"></a>
