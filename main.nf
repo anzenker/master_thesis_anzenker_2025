@@ -393,8 +393,7 @@ process FETCH_TEST_DATA {
   """
 }
 
-workflow RUN( Path RAW = file(params.raw_reads),
-               Path GEN = file(params.genome) ){
+workflow RUN( RAW, GEN ){
 
     // show help message and exit
     if (params.help){
