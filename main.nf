@@ -534,6 +534,8 @@ workflow RUN {
         plotBUSCOCompleteness(params.python_file_4, buscoVertebrataCompleteness.out, 
                                 params.species_name ?: 'Species'
         )
+        // select only the 'canonical' BUSCO result
+        def canonical_busco = buscoVertebrataCompleteness.out.filter { table, label -> label == 'canonical' }
         }
 
     // 7. eggNOG (optional) - BUT only if ORF (5.) ran
@@ -547,8 +549,6 @@ workflow RUN {
 
      } 
 
-     // select only the 'canonical' BUSCO result
-     def canonical_busco = buscoVertebrataCompleteness.out.filter { table, label -> label == 'canonical' }
 
     // 8) Overview (only if ALL present)
     if ( !params.skip_plots && !params.skip_busco && !params.skip_orf && !params.skip_eggnog ) {
