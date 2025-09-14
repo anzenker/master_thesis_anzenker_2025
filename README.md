@@ -112,7 +112,7 @@ nextflow run anzenker/master_thesis_anzenker_2025/ -r main -entry test -profile 
 
 <a name="pipe_flow"></a>
 #### 4.2.3 ms-pipeline flowchart overview
-![pipeline_flowchart.png](/images/pipeline_flowchart.png)
+![ms_pipeline_flowchart.png](/images/ms_pipeline_flowchart.png)
 
 An exemplary description of the output files and output plots can be found here: [exemplary_results_output.md](/docs/exemplary_results_output.md)
 
