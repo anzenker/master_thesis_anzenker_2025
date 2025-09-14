@@ -560,7 +560,9 @@ workflow RUN( RAW, GEN ){
 
 }
 
-workflow { RUN() }
+workflow {
+  RUN( file(params.raw_reads), file(params.genome) )
+}
 
 
 
