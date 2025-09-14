@@ -380,7 +380,21 @@ process uniprotAnnotation {
     """
 }
 
-workflow {
+process FETCH_TEST_DATA {
+  tag "$name"
+  publishDir 'test_inputs', mode: 'copy'
+  input:
+    tuple val(name), val(url)
+  output:
+    path "test_inputs/${name}"
+  script:
+  """
+  mkdir -p test_inputs
+  curl -L -o test_inputs/${name} ${url}
+  """
+}
+
+workflow main {
 
     // show help message and exit
     if (params.help){
@@ -546,3 +560,32 @@ workflow {
     }
 
 }
+
+workflow { main() }
+
+
+
+workflow test {
+  /*
+   * Only used when you run:
+   *   nextflow run ms_pipeline.nf -entry test -profile test
+   * It grabs the tiny test files from URLs, then calls main() with local paths.
+   */
+
+  // URLs come from the 'test' profile in nextflow.config
+  def rawName    = 'raw.fastq.gz'
+  def genomeName = 'Chr_test.fa.gz'
+
+  // download the two artifacts
+  def raw_dl    = FETCH_TEST_DATA( Channel.value(tuple(rawName,    params.raw_reads)) ).out
+  def genome_dl = FETCH_TEST_DATA( Channel.value(tuple(genomeName, params.genome))    ).out
+
+  // set params to the freshly-downloaded local files (single values)
+  params.raw_reads = file("test_inputs/${rawName}")
+  params.genome    = file("test_inputs/${genomeName}")
+
+  // call your real pipeline
+  main()
+}
+
+
