@@ -24,7 +24,7 @@ def helpMessage() {
 
 
         Mandatory arguments:
-            -r/--raw_reads              Path to input data - raw seqeuncing reads
+            -r/--raw_reads              Path to input data - raw sequencing reads
             -g/--genome                 Path to input data - reference genome file (FASTA)
             -with-docker                run pipeline with docker
 
@@ -393,7 +393,7 @@ process FETCH_TEST_DATA {
   """
 }
 
-workflow RUN( RAW, GEN ){
+workflow RUN(raw_path, genome_path ){
 
     // show help message and exit
     if (params.help){
@@ -401,10 +401,10 @@ workflow RUN( RAW, GEN ){
         exit 0
     }
     // parameter check
-    if (RAW) {
+    if (raw_path) {
         exit 1, "Missing paramter: --raw_reads"
     }
-    if (GEN){
+    if (genome_path){
         exit 1, "Missing parameter: --genome"
     }
     if (params.skip_eggnog) {
@@ -425,8 +425,8 @@ workflow RUN( RAW, GEN ){
     def summary = [:]
     summary['Pipeline Name']    = 'ms_pipeline'
     summary['Run Name']         = workflow.runName
-    summary['Raw Reads']        = RAW
-    summary['Reference Genome'] = GEN
+    summary['Raw Reads']        = raw_path
+    summary['Reference Genome'] = genome_path
     summary['Threads']          = params.threads
     summary['Output Directory'] = params.outdir
     summary['User']             = workflow.userName
@@ -437,7 +437,7 @@ workflow RUN( RAW, GEN ){
     // 1. minimap & samtools
     // map raw reads to the genome assembly
     //***************************************
-    minimap2RawToGenome(RAW, GEN, params.threads)
+    minimap2RawToGenome(raw_path, genome_path, params.threads)
     // --> % of mapping
 
     //***************************************
@@ -458,7 +458,7 @@ workflow RUN( RAW, GEN ){
     //3. gffread
     // read seqeuences with gtf and genome assembly into fasta file
     //***************************************
-    gffreadToFasta(stringtie2Transcriptome.out, file(params.genome))
+    gffreadToFasta(stringtie2Transcriptome.out, genome_path)
     // OUTPUT --> read metrics & plot read length distribution
 
     //***************************************
@@ -561,7 +561,7 @@ workflow RUN( RAW, GEN ){
 }
 
 workflow {
-  RUN( file(params.raw_reads), file(params.genome) )
+  RUN(file(params.raw_reads), file(params.genome) )
 }
 
 
@@ -573,8 +573,8 @@ workflow test {
   )
 
   def fetched = FETCH_TEST_DATA(items).out
-  def RAW = fetched.filter { it.name == 'raw.fastq.gz' }
-  def GEN = fetched.filter { it.name == 'Chr_test.fa.gz' }
+  def RAW = fetched.filter { it.name == 'Chr_raw_reads_testdata.fastq.gz' }
+  def GEN = fetched.filter { it.name == 'Chr_test.fa' }
 
   // pass the channels/paths to main — now the dependency is explicit
   RUN(RAW, GEN)
