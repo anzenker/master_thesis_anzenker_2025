@@ -95,9 +95,9 @@ nextflow run anzenker/master_thesis_anzenker_2025 -r main -help
 nextflow run anzenker/master_thesis_anzenker_2025 -r main --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS
 ```
 **Quickstart - Run pipeline without eggNOG & BUSCO database download**
-Information: There will only be the functional assessment of predicted ORFs with these parameters.
+Information: This quick run will use a small test dataset from another repository. Runtime ~2min. This will only test part of the pipeline, excluding all steps including BUSCO, and eggNOG annotation
 ```
-nextflow run anzenker/master_thesis_anzenker_2025 -r main --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS --skip-eggnog --skip-busco
+nextflow run anzenker/master_thesis_anzenker_2025/ -r main -entry test -profile test
 ```
 
 *Optional parameters 
