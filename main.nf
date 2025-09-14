@@ -395,8 +395,12 @@ process FETCH_TEST_DATA {
     """
 }
 
-workflow RUN(raw_path, genome_path){
+workflow RUN {
+    take:
+    path raw_path
+    path genome_path
 
+    main:
     // show help message and exit
     if (params.help){
         helpMessage()
@@ -562,22 +566,26 @@ workflow RUN(raw_path, genome_path){
 
 }
 
-workflow {
-    RUN(file(params.raw_reads), file(params.genome))
+workflow main {
+    if (params.help) { helpMessage(); exit 0 }
+    if (!params.raw_reads) exit 1, "Missing parameter: --raw_reads"
+    if (!params.genome)    exit 1, "Missing parameter: --genome"
+
+    RUN( file(params.raw_reads), file(params.genome) )
 }
 
 workflow test {
+    // Items come from nextflow.config profile "test"
     def items = Channel.of(
     tuple('raw.fastq.gz',   params.raw_reads),
-    tuple('Chr_test.fa.gz', params.genome)
+    tuple('genome.fa',      params.genome)
     )
 
     def fetched = FETCH_TEST_DATA(items).out
-    def RAW = fetched.filter { it.name == 'Chr_raw_reads_testdata.fastq.gz' }
-    def GEN = fetched.filter { it.name == 'Chr_test.fa' }
+    def RAW = fetched.filter { it.name == 'raw.fastq.gz' }
+    def GEN = fetched.filter { it.name == 'genome.fa' }
 
-  // pass the channels/paths to main — now the dependency is explicit
-    RUN(RAW, GEN)
+    RUN(RAW, GEN)   // RAW/GEN are paths (ok), or channels of single paths (also ok)
 }
 
 
