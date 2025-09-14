@@ -407,7 +407,8 @@ process FETCH_GENOME {
   """
 }
 
-workflow RUN {
+workflow RUN( Path RAW = file(params.raw_reads),
+               Path GEN = file(params.genome) ){
 
     // show help message and exit
     if (params.help){
@@ -415,10 +416,10 @@ workflow RUN {
         exit 0
     }
     // parameter check
-    if (!params.raw_reads) {
+    if (RAW) {
         exit 1, "Missing paramter: --raw_reads"
     }
-    if (!params.genome){
+    if (GEN){
         exit 1, "Missing parameter: --genome"
     }
     if (params.skip_eggnog) {
@@ -439,8 +440,8 @@ workflow RUN {
     def summary = [:]
     summary['Pipeline Name']    = 'ms_pipeline'
     summary['Run Name']         = workflow.runName
-    summary['Raw Reads']        = params.raw_reads
-    summary['Reference Genome'] = params.genome
+    summary['Raw Reads']        = RAW
+    summary['Reference Genome'] = GEN
     summary['Threads']          = params.threads
     summary['Output Directory'] = params.outdir
     summary['User']             = workflow.userName
@@ -451,7 +452,7 @@ workflow RUN {
     // 1. minimap & samtools
     // map raw reads to the genome assembly
     //***************************************
-    minimap2RawToGenome(file(params.raw_reads), file(params.genome), params.threads)
+    minimap2RawToGenome(RAW, GEN, params.threads)
     // --> % of mapping
 
     //***************************************
