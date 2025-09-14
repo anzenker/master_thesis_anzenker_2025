@@ -394,7 +394,7 @@ process FETCH_TEST_DATA {
   """
 }
 
-workflow main {
+workflow RUN {
 
     // show help message and exit
     if (params.help){
@@ -561,7 +561,7 @@ workflow main {
 
 }
 
-workflow { main() }
+workflow { RUN() }
 
 
 
