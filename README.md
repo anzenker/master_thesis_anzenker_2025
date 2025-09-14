@@ -11,9 +11,9 @@
       + 3.2.2 [ Run the ms-pipeline (run) ](#run)
       + 3.2.3 [ ms-pipeline flowchart overview (flowchart) ](#flowchart)
       + 3.2.4 [ ms-pipeline results directory (dict) ](#dict)
-      + 3.2.5 [ Code implemented into the nanoTome pipeline (code) ](#code)
+      + 3.2.5 [ Code implemented into the ms-pipeline (code) ](#code)
     + 3.3 [ Additional Annoation with BLAST (addanno) ](#addanno)
-      + 3.3.1 [ UniProt annotation (uniprot) ] (#uniprot)
+      + 3.3.1 [ UniProt annotation (uniprot) (uniprot) ] (#uniprot)
  4. [ Some file formats explained ](#file-formats)
  5. [ Links to software tools for manual installation (soft)](#soft)
  6. [ Some extra commands ](#extra)
@@ -52,8 +52,6 @@ It integrates several key steps:
 •	Completeness assessment with BUSCO Vertebrata to evaluate the presence of conserved orthologs,	
 •	Open Reading Frame (ORF) prediction with TransDecoder to identify whether transcripts encode complete or partial proteins, and	
 •	Functional annotation with eggNOG to provide an initial overview of transcriptome functionality. 
-
-Together, this pipeline delivers an assembled transcriptome and a first functional assessment (vertebrata orthologs, coding potential, and functional content). 
 
 The ms-pipeline thereby offers a reproducible and user-friendly workflow for assembling and assessing transcriptomes generated from ONT dRNA-seq data and directly placing them into a functional context. 
 
@@ -116,14 +114,13 @@ nextflow run anzenker/master_thesis_anzenker_2025/ -r main -entry test -profile 
 ```
 (runtime ~2 min, runs without BUSCO/eggNOG)
 
-*Optional parameters 
+**Optional parameters**
 - --outdir NAME     (defines the name of the output directory) 
 - --color HEX_CODE  (defines the plot color for the output plots, requires a hex color code e.g. #688e26)
 - --skip_eggnog true  (runs the workflow without eggNOG annotation)
 - --skip_busco true   (runs the workflow without busco analysis)
 - --skip_orf          (runs the workflow without orf prediction and without eggNOG annotation)
 - --no_plots          (no output plots are generated from the workflow)
-*
 
 <a name="flowchart"></a>
 ### 3.2.3 ms-pipeline flowchart overview
