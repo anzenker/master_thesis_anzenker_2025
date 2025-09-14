@@ -53,9 +53,20 @@ It integrates several key steps:
 •	Open Reading Frame (ORF) prediction with TransDecoder to identify whether transcripts encode complete or partial proteins, and	
 •	Functional annotation with eggNOG to provide an initial overview of transcriptome functionality. 
 
-The ms-pipeline thereby offers a reproducible and user-friendly workflow for assembling and assessing transcriptomes generated from ONT dRNA-seq data and directly placing them into a functional context. 
+Together, these steps provide a reproducible and user-friendly workflow for assembling transcriptomes from ONT dRNA-seq data and placing them directly into a functional context.
 
-The ms-pipeline originates from a Master’s thesis project studying hybridization effects in the parthenogenetic species *Aspidoscelis (A.) neomexicanus* and its sexual parental species, *A. marmoratus* and *A. arizonae*. Since assembling a single transcriptome involves more than one time-consuming step, the aim was to combine and automate most of the process for efficient analysis of multiple tissue samples, species, and replicates. The pipeline enables quicker and standardized transcriptome assembly and functional assessment, preparing the data for subsequent analyses.
+The ms-pipeline originates from a Master’s thesis project studying hybridization effects in the parthenogenetic species *Aspidoscelis (A.) neomexicanus* and its sexual parental species, *A. marmoratus* and *A. arizonae*. Since assembling a single transcriptome involves more than one time-consuming step, the aim was to combine and automate most of the process for efficient analysis of multiple tissue samples, species, and replicates. It allows quicker and standardized transcriptome assembly and assessment, preparing the data for downstream analyses.
+
+**Comparison to existing workflows**
+The ms-pipeline shared similarities with [wf-transcriptome](https://github.com/nanoporetech/wf-transcriptome), which also uses minimap2 and StringTie2 for reference-guided reconstruction and additonally provides differential expression analysis. However, it does not offer functional annotation or completeness assessment. 
+
+In contrast, the ms-pipeline integrates:
+- **BUSCO** for evaluating transcriptome completeness,
+- **TransDecoder** for ORF prediction,
+- **eggNOG** for functional annotation,
+- and a set of **summary plots** for functional assessment and isoform assessment.  
+
+This makes ms-pipeline an additional solution for ONT direct RNA-seq data, combining assembly, completeness, and functional assessment in a single reproducible workflow.
 
 <a name="install"></a>
 ### 3.2.1 Installation Requirements
