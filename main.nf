@@ -585,7 +585,7 @@ workflow test {
   params.genome    = file("test_inputs/${genomeName}")
 
   // call your real pipeline
-  main()
+  RUN()
 }
 
 
