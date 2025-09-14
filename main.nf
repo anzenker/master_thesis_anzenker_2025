@@ -566,7 +566,7 @@ workflow RUN {
 
 }
 
-workflow main {
+workflow {
     if (params.help) { helpMessage(); exit 0 }
     if (!params.raw_reads) exit 1, "Missing parameter: --raw_reads"
     if (!params.genome)    exit 1, "Missing parameter: --genome"
