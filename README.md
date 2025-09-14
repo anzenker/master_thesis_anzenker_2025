@@ -2,15 +2,22 @@
 
 ###### ================================================================================
 ###### OVERVIEW
- 1. [ This Repository ](#rep)
- 2. [ Hardware and Operating System ](#OS)
- 3. [ Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data ](#guide)
-    + 3.1 [ Basecalling & Preprocessing ](#prepros)
-    + 3.2 [ Master Thesis Pipeline (ms-pipeline) ](#ms-pipeline)
-    + 3.3 [ Additional Annoation with BLAST ](#addanno)
- 4. [ Some file formats explained ](#file-formats)
- 5. [ Some extra commands ](#extra)
- 6. [ Abbreviations ](#abbrev)
+## 1. [ This Repository ](#rep)
+## 2. [ Hardware and Operating System ](#OS)
+## 3. [ Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data ](#guide)
+###    + 3.1 [ Basecalling & Preprocessing ](#prepros)
+###    + 3.2 [ ms-pipeline (Master Thesis Pipeline) (ms-pipeline) ](#ms-pipeline)
+####      + 3.2.1 [ Installation Requirements (install) ](#install)
+####      + 3.2.2 [ Run the ms-pipeline (run) ](#run)
+####      + 3.2.3 [ ms-pipeline flowchart overview (flowchart) ](#flowchart)
+####      + 3.2.4 [ ms-pipeline results directory (dict) ](#dict)
+####      + 3.2.5 [ Code implemented into the nanoTome pipeline (code) ](#code)
+###    + 3.3 [ Additional Annoation with BLAST (addanno) ](#addanno)
+####      + [ 3.3.1 UniProt annotation (uniprot) ] (#uniprot)
+## 4. [ Some file formats explained ](#file-formats)
+## 5. [ Links to software tools for manual installation (soft)](#soft)
+## 6. [ Some extra commands ](#extra)
+## 7. [ Abbreviations ](#abbrev)
 ###### ================================================================================
 
 <a name="rep"></a>
@@ -44,8 +51,8 @@ It combines steps for reconstructing the transcriptome (stringtie2), evaluating 
 
 The ms-pipeline originates from a Master Thesis project studying hybridization effects in the parthenogenetic species *Aspidoscelis (A.) neomexicanus* and its sexual parental species, *A. marmoratus* and *A. arizonae*. Since assembling a single transcriptome involves more than one time-consuming step, the aim was to combine and automate most of the process for efficient analysis of multiple tissue samples and species. The pipeline enables quicker and standardized transcriptome assembly and its functional assessment, preparing the data for subsequent analyses.
 
-<a name="pipe_install"></a>
-#### 4.2.1 Installation Requirements
+<a name="install"></a>
+#### 3.2.1 Installation Requirements
 These tools are needed to set up the environment and run the pipeline.
 
 - **[nextflow](https://www.nextflow.io/docs/latest/install.html)**: Workflow manager to run the analysis pipeline in a reproducible way.
@@ -83,7 +90,7 @@ wget https://busco-data.ezlab.org/v5/data/lineages/vertebrata_odb10.2024-01-08.t
 tar -xzf vertebrata_odb10.2024-01-08.tar.gz
 ```
 
-<a name="pipe_run"></a>
+<a name="run"></a>
 #### 3.2.2 Run the ms-pipeline
 The nextflow pipeline runs on a Docker image by default.
 
@@ -110,14 +117,14 @@ nextflow run anzenker/master_thesis_anzenker_2025/ -r main -entry test -profile 
 - --no_plots          (no output plots are generated from the workflow)
 *
 
-<a name="pipe_flow"></a>
-#### 4.2.3 ms-pipeline flowchart overview
+<a name="flowchart"></a>
+#### 3.2.3 ms-pipeline flowchart overview
 ![ms_pipeline_flowchart.png](/images/ms_pipeline_flowchart.png)
 
 An exemplary description of the output files and output plots can be found here: [exemplary_results_output.md](/docs/exemplary_results_output.md)
 
-<a name="pipe_dir"></a>
-#### 4.2.4 ms-pipeline results directory
+<a name="dict"></a>
+#### 3.2.4 ms-pipeline results directory
 ```
 .
 └──  RESULTS
@@ -142,15 +149,15 @@ An exemplary description of the output files and output plots can be found here:
 │           └── ...
 ```
 
-<a name="manual"></a>
-#### 3.2.4 Code implemented into the nanoTome pipeline
+<a name="code"></a>
+#### 3.2.5 Code implemented into the nanoTome pipeline
 All code implemented into the pipeline can be found in [commands.md](/docs/commands.md) for manual execution.
 
 <a name="addanno"></a>
-## 4.3. Additional Annotation
+## 3.3. Additional Annotation
 To generate a broader functional annotation of the Transcriptome.
-<a name="up"></a>
-### 4.3.1 UniProt annotation 
+<a name="uniprot"></a>
+### 3.3.1 UniProt annotation 
 
 ### Download and make database locally
 ```
@@ -182,11 +189,11 @@ blastp -query transdecoder_dir/longest_orfs.pep  \
 ```
 
 <a name="file-formats"></a>
-## 5. Some file formats explained
+## 4. Some file formats explained
 Some file formats used to analyse the data are explained in  [file_formats.md](/docs/file_formats.md).
 
 <a name="soft"></a>
-## 6. Links to software tools for manual installation
+## 5. Links to software tools for manual installation
 [software_links.md](/docs/software_links.md)
 
 <a name="extra"></a>
