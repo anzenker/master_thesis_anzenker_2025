@@ -379,21 +379,7 @@ process uniprotAnnotation {
     """
 }
 
-process FETCH_READS {
-  tag "$name"
-  publishDir 'test_inputs', mode: 'copy'
-  input:
-    tuple val(name), val(url)
-  output:
-    path "test_inputs/${name}"
-  script:
-  """
-  mkdir -p test_inputs
-  curl -L -o test_inputs/${name} ${url}
-  """
-}
-
-process FETCH_GENOME {
+process FETCH_TEST_DATA {
   tag "$name"
   publishDir 'test_inputs', mode: 'copy'
   input:
@@ -580,26 +566,17 @@ workflow { RUN() }
 
 
 workflow test {
-  /*
-   * Only used when you run:
-   *   nextflow run ms_pipeline.nf -entry test -profile test
-   * It grabs the tiny test files from URLs, then calls main() with local paths.
-   */
+  def items = Channel.of(
+    tuple('raw.fastq.gz',   params.raw_reads),
+    tuple('Chr_test.fa.gz', params.genome)
+  )
 
-  // URLs come from the 'test' profile in nextflow.config
-  def rawName    = 'raw.fastq.gz'
-  def genomeName = 'Chr_test.fa.gz'
+  def fetched = FETCH_TEST_DATA(items).out
+  def RAW = fetched.filter { it.name == 'raw.fastq.gz' }
+  def GEN = fetched.filter { it.name == 'Chr_test.fa.gz' }
 
-  // download the two artifacts
-  def raw_dl    = FETCH_READS( Channel.value(tuple(rawName,    params.raw_reads)) ).out
-  def genome_dl = FETCH_GENOME( Channel.value(tuple(genomeName, params.genome))    ).out
-
-  // set params to the freshly-downloaded local files (single values)
-  params.raw_reads = file("test_inputs/${rawName}")
-  params.genome    = file("test_inputs/${genomeName}")
-
-  // call your real pipeline
-  RUN()
+  // pass the channels/paths to main — now the dependency is explicit
+  RUN(RAW, GEN)
 }
 
 
