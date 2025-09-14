@@ -15,7 +15,7 @@
 
 <a name="rep"></a>
 ## 1. This Repository
-This repository provides a step-by-step guide for assembling and annotating a transcriptome from Oxford Nanopore direct RNA sequencing (dRNA-seq) data using a reference genome. It includes initial quality checks and lays the foundation for reproducible analyses across different tissues and species.
+This repository provides a step-by-step guide for assembling and annotating a transcriptome from Oxford Nanopore direct RNA sequencing (dRNA-seq) data using a reference genome. It includes initial functional assessment of the transcriptome and lays the foundation for reproducible analyses across different tissues, species, and replicates.
 
 This guide is separated into 3 Parts:
 1. Basecalling & Preprocessing of the Raw Sequencing Data
