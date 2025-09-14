@@ -2,15 +2,15 @@
 
 ###### ================================================================================
 ###### OVERVIEW
-* 1. [ This Repository ](#rep)
-* 2. [ Hardware and Operating System ](#OS)
-* 3. [ Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data ](#guide)
-    * 3.1 [ Basecalling & Preprocessing ](#prepros)
-    * 3.2 [ Master Thesis Pipeline (ms-pipeline) ](#ms-pipeline)
-    * 3.3 [ Additional Annoation with BLAST ](#addanno)
-* 4. [ Some file formats explained ](#file-formats)
-* 5. [ Some extra commands ](#extra)
-* 6. [ Abbreviations ](#abbrev)
++ 1. [ This Repository ](#rep)
++ 2. [ Hardware and Operating System ](#OS)
++ 3. [ Guide to assemble and annotate a Transcriptome from ONT dRNA-seq data ](#guide)
+    + 3.1 [ Basecalling & Preprocessing ](#prepros)
+    + 3.2 [ Master Thesis Pipeline (ms-pipeline) ](#ms-pipeline)
+    + 3.3 [ Additional Annoation with BLAST ](#addanno)
++ 4. [ Some file formats explained ](#file-formats)
++ 5. [ Some extra commands ](#extra)
++ 6. [ Abbreviations ](#abbrev)
 ###### ================================================================================
 
 <a name="rep"></a>
