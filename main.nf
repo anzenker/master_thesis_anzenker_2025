@@ -26,12 +26,10 @@ def helpMessage() {
         Mandatory arguments:
             -r/--raw_reads              Path to input data - raw sequencing reads
             -g/--genome                 Path to input data - reference genome file (FASTA)
-            -with-docker                run pipeline with docker
 
         Other options:
             -t/--threads                no. of threads (default: 1)
             -o/--outdir                 The output directory where the results will be saved
-            -w/--work-dir               The temporary directory where intermediate data will be saved
             -sn/--species_name          For species names "A. arizonae", "A. marmoratus" and "A. neomexicanus" a specified plotting color is given.
             -c/--color                  Specific color for output plots created with Python. Default color is lavender (#C79FEF).
 
@@ -527,7 +525,7 @@ workflow RUN {
             //----------------------------------------
         }   
     }
-
+    def canonical_busco = Channel.empty()
     // 6. BUSCO (otional)
     if (!params.skip_busco) {
         //***************************************
@@ -551,7 +549,7 @@ workflow RUN {
                                 params.species_name ?: 'Species'
         )
         // select only the 'canonical' BUSCO result
-        def canonical_busco = buscoVertebrataCompleteness.out.filter { table, label -> label == 'canonical' }
+        canonical_busco = buscoVertebrataCompleteness.out.filter { table, label -> label == 'canonical' }
         }
 
     // 7. eggNOG (optional) - BUT only if ORF (5.) ran
