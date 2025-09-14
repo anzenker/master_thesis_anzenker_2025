@@ -411,7 +411,7 @@ workflow test {
     tuple('Chr_test.fa',      params.genome)
     )
 
-    def fetched = FETCH_TEST_DATA.out
+    def fetched = FETCH_TEST_DATA(items)
     def RAW = fetched.filter { it.name == 'Chr_raw_reads_testdata.fastq.gz' }
     def GEN = fetched.filter { it.name == 'Chr_test.fa' }
 
