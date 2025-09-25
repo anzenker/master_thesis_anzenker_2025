@@ -207,6 +207,6 @@ blastp -query transdecoder_dir/longest_orfs.pep  \
 
 ###### -------------------------------------------------------------------------------------------------------------------------
 <a name="soft"></a>
-## 4. Links to software tools for manual installation
-[software_links.md](/docs/software_links.md)
+## 4. Links to software tools for manual installation and usage
+[commands.md](/docs/commands.md)
 
