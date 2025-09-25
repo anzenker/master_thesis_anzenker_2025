@@ -28,23 +28,36 @@
 ## 1. Preprocessing
 <a name="dorado"></a>
 ### 1.1. dorado basecalling [https://github.com/nanoporetech/dorado]
-We will generate an unaligned BAM file (.ubam) as we are not directly mapping the sequencing data to a refence genome file.
+
+Converts ONT raw .pod5 files into unaligned .ubam reads. Here we will generate an unaligned BAM file (.ubam) as we are not directly mapping the sequencing data to a reference genome file.
+
 - input: *.pod5
 - output: .ubam
+
 ```
 dorado basecaller --emit-moves --estimate-poly-a sup,m5C,inosine_m6A,pseU /pathTo/pod5 > xxx_basecalls.ubam
 ```
 
 <a name="file_format"></a>
 ### 1.2. samtools - ubam to fastq [https://www.htslib.org/doc/samtools.html]
+
+Convert .ubam basecalled reads into .fastq format.
+
 - input: .ubam
 - output: .fastq
+
 ```
 samtools fastq -t -@ 8 xxx_basecalls.ubam > xxx_basecalls.fastq
 ```
 
 <a name="rna_cs"></a>
 ### 1.3. Filtering RNA CS Control Sequences
+
+Remove ONT spike-in RNA CS control reads from the dataset using minimap2 & seqkit.
+
+- input: raw_reads.fasta
+- output: read_ids.txt, filtered.fastq/.fasta
+
 **(1) Download the Sequences** 
 Download the RNA CS sequences. Follow the link: [RNA CS (RNC)](https://nanoporetech.com/support/library-prep/RNA-and-cDNA/what-is-rna-cs-rcs)
 
@@ -68,14 +81,25 @@ seqkit grep -v -f read_ids.txt raw_reads.fastq -o raw_reads_filtered.fastq
 
 <a name="#pycoQC"></a>
 ### 1.4. pycoQC [https://a-slide.github.io/pycoQC/installation/]
-The sequencing summary file to best use for this Quality Control report is availabel with the raq seqeuncing data. It is generated from the sequencing run. It hold information of ids, pore healt, start time, etc.
-A report can also be generated from .fastq or .fasta files but it will show less information on the sequencing run.
+
+Generate interactive QC metrics and plots from ONT sequencing summary files.
+
+The sequencing summary file to best use for this Quality Control report is available with the raw sequencing data. It is generated from the sequencing run. It holds information of IDs, pore health, start time, etc..
+A report can also be generated from .fastq or .fasta files, but it will show less information on the sequencing run.
+
 ```
 pycoQC --summary file sequencing_summary.txt -o pycoQC_output.html 
 ```
 
+Another useful tool to use for this case is [NanoPlot](https://github.com/wdecoster/NanoPlot).
+
 <a name="phred_filter"></a>
 ### 1.5. chopper - Filtering based on PHRED-score [https://github.com/wdecoster/chopper]
+
+Filters sequencing reads based on mean PHRED quality score thresholds or other parameters.
+
+- input: raw_reads.fastq/.fasta
+- output: filtered.fastq/.fasta
 
 ```
 gunzip –c xxx.fastq.gz | chopper --quality 10 --threads 18 --input | gzip xxx_filteredQ10.fastq.gz 
@@ -84,6 +108,8 @@ gunzip –c xxx.fastq.gz | chopper --quality 10 --threads 18 --input | gzip xxx_
 
 <a name="nanoComp"></a>
 ### 1.6. NanoComp [https://github.com/wdecoster/nanocomp]
+
+Compare multiple ONT sequencing runs or datasets based on QC metrics.
 
 ```
 # nanoComp report (compare fastq, fasta, summary)
@@ -101,6 +127,7 @@ It is important to notice that this is not a validated script, but it was tested
 
 - input: raw_reads.fastq
 - output: overview.tsv, raw_reads_noA.fasta
+- 
 ```
 python detect_and_trim_polyA.py raw_read.fastq
 ```
@@ -127,12 +154,13 @@ seqkit grep -v -f read_ids.txt raw_reads.fastq -o raw_reads_noR.fastq
 ## 2. Nextflow Pipeline - Implemented Tool Commands 
 ## Transcriptome Reconstruction & Annotation
 
-As the reconstruction and analyses of biological data can be very individual and to also provide the user with the knwoledge of how every step was used and in what order, all commands implemented into the nextflow pipeline are listed in this README. With this it is also easy to follow each step and/or use one ore more individually if necessary. 
+As the reconstruction and analyses of biological data can be very individual and also provide the user with the knowledge of how every step was used and in what order, all commands implemented into the NextFlow pipeline are listed in this README. With this, it is also easy to follow each step and/or use one or more steps individually if necessary. 
 
 #### **Commands implemented into the pipeline:**
 
 <a name="minimap2"></a>
 ## 1.1 [minimap2](https://lh3.github.io/minimap2/minimap2.html) & [samtools](https://www.htslib.org/doc/samtools.html) - Mapping the raw reads to the reference genome
+
 ```
 # 1. minimap2 - mapping of the raw reads to the reference genome
 minimap2 -y --MD -ax splice -uf -k14 -t 24 xxx_genome.fa raw_reads.fastq.gz | samtools sort -@ 24 -o xxx_genome_mapped.bam
@@ -141,6 +169,7 @@ samtools index xxx_genome_mapped.bam
 ```
 <a name="stringtie22"></a>
 ## 1.2  [stringtie2](https://github.com/skovaka/stringtie2) - Reference-guided Transcriptome Assembly
+
 ```
 # 2. stringtie2 - transcriptome reconstruction
 stringtie -o stringtie2_xxx_transcripts.gtf -l NAME_PREFIX -L -p 24 xxx_genome_mapped.bam
@@ -148,6 +177,7 @@ stringtie -o stringtie2_xxx_transcripts.gtf -l NAME_PREFIX -L -p 24 xxx_genome_m
 
 <a name="gffread"></a>
 ## 2.3  [gffread](https://github.com/gpertea/gffread) - Reading the transcript sequences from the Reference Genome 
+
 ```
 # 3. gffread - extract transcript sequences
 gffread -w xxx_transcripts.fa -g xxx_genome.fa stringtie2_xxx_transcripts.gtf
@@ -155,10 +185,24 @@ gffread -w xxx_transcripts.fa -g xxx_genome.fa stringtie2_xxx_transcripts.gtf
 
 <a name="cano"></a>
 ## 2.4 Choosing the Canonical Transcriptome
-...
+
+One representative (canonical) transcript per gene ID is chosen. Here for each gene ID, the isoform with the highest nucleotide coverage (i.e., the most bases supported by aligned reads) was selected as the canonical transcript. This is done with a bustom script.
+
+```
+# 4. choose the canonical transcripts
+python 4_choose_canonical_transcripts.py input.tsv output.txt
+
+#extract these canonical IDs into a filtered transcriptome FASTA
+seqkit grep -f output.txt transcriptome.fasta -o canonical_transcripts.fasta
+```
+_input_tsv_: TSV file holding the information of gene ID, transcript ID, and the stringtie2 calculated coverage value.
+_output_txt_: output TXT file name/path, holding the canonical transcript IDs
 
 <a name="busco"></a>
 ## 2.5  [BUSCO](https://busco.ezlab.org/busco_userguide.html) - Vertebrata Ortholog Assessment
+
+Assesses completeness of the transcriptome based on conserved orthologs from the Vertebrata dataset.
+
 ```
 # 4. BUSCO - Transcriptome Completeness Assessment
 # offline:
@@ -169,6 +213,9 @@ busco -i xxx_transcripts.fa -l vertebrata_odb10 -o OUTPUT_FILDER/ -m transcripto
 
 <a name="transdec"></a>
 ## 2.6  [TransDecoder](https://github.com/TransDecoder/TransDecoder/wiki) - ORF Prediction
+
+Predicts coding regions (open reading frames, ORFs) from transcript sequences.
+
 ```
 # 5. TransDecoder - predict Open Reading Frames (ORFs)
 TransDecoder.LongOrfs -t xxx_transcripts.fa 
@@ -176,6 +223,9 @@ TransDecoder.LongOrfs -t xxx_transcripts.fa
 
 <a name="eggnog"></a>
 ## 2.7  [eggNOG](https://github.com/eggnogdb/eggnog-mapper/wiki/eggNOG-mapper-v2.1.5-to-v2.1.13) Annotation
+
+Annotates predicted protein sequences with orthology-based functional information.
+
 (1) Download the database
 For database download instructions, refer to [README_commands_used.md](README_commands_used.md)
 
