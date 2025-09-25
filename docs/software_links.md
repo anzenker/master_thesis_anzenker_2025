@@ -60,16 +60,12 @@ Extracts transcript sequences from the genome assembly using the stringtie GTF o
 
 <a name="trans-anno"></a>
 ## 4.4 Transcriptome Annotation
-These tools annotate the reconstructed transcripts with protein function information.
+These tools annotate the reconstructed transcripts with functional information.
 
 <a name="eggNOG"></a>
 ### 4.3.1 [eggNOG](https://github.com/eggnogdb/eggnog-mapper)
 Annotates transcripts using orthology-based functional information.
 
-<a name="interproscan"></a>
-### 4.3.2 [InterProScan](https://github.com/ebi-pf-team/interproscan)
-Identifies protein domains and motifs. Run manually outside the pipeline.
-
 <a name="blast"></a>
-### 4.3.3 [Blast](https://github.com/enormandeau/ncbi_blast_tutorial)
+### 4.3.2 [Blast](https://github.com/enormandeau/ncbi_blast_tutorial)
 Used to annotate transcripts with UniProt database, identify sequence similarity and reciprocal best hits between transcripts.
