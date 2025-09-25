@@ -49,6 +49,7 @@ Basecalling and Preprocessing can be accomplished in different approaches. A use
 The ms-pipeline is designed to assemble and annotate transcriptomes from Oxford Nanopore Technologies (ONT) direct RNA sequencing (dRNA-seq) data, using a reference genome as a guide. 
 
 It integrates several key steps:	
+
 •	Transcriptome reconstruction with StringTie2,	
 •	Completeness assessment with BUSCO Vertebrata to evaluate the presence of conserved orthologs,	
 •	Open Reading Frame (ORF) prediction with TransDecoder to identify whether transcripts encode complete or partial proteins, and	
