@@ -14,10 +14,8 @@
       + 3.2.5 [ Code implemented into the ms-pipeline (code) ](#code)
     + 3.3 [ Additional Annoation with BLAST (addanno) ](#addanno)
       + 3.3.1 [ UniProt annotation (uniprot) (uniprot) ] (#uniprot)
- 4. [ Some file formats explained ](#file-formats)
- 5. [ Links to software tools for manual installation (soft)](#soft)
- 6. [ Some extra commands ](#extra)
- 7. [ Abbreviations ](#abbrev)
+ 4. [ Links to software tools for manual installation (soft)](#soft)
+
 ###### ================================================================================
 
 ###### -------------------------------------------------------------------------------------------------------------------------
@@ -208,26 +206,7 @@ blastp -query transdecoder_dir/longest_orfs.pep  \
 ```
 
 ###### -------------------------------------------------------------------------------------------------------------------------
-<a name="file-formats"></a>
-## 4. Some file formats explained
-Some file formats used to analyse the data are explained in  [file_formats.md](/docs/file_formats.md).
-
-###### -------------------------------------------------------------------------------------------------------------------------
 <a name="soft"></a>
-## 5. Links to software tools for manual installation
+## 4. Links to software tools for manual installation
 [software_links.md](/docs/software_links.md)
 
-###### -------------------------------------------------------------------------------------------------------------------------
-<a name="extra"></a>
-## 6. Some extra commands
-Command to check stats in a .fasta or .fastq file:
-```
-seqkit stats *.fasta
-```
-
-###### -------------------------------------------------------------------------------------------------------------------------
-<a name="abbrev"></a>
-## 7. Abbreviations
-- ONT   Oxford Nanopore
-- QC    Quality Control
-- mRNA  messenger RNA
