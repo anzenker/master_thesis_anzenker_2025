@@ -27,9 +27,9 @@
 <a name="prepro"></a>
 ## 1. Preprocessing
 <a name="dorado"></a>
-### 1.1. dorado basecalling [https://github.com/nanoporetech/dorado]
+### 1.1. [dorado basecalling](https://github.com/nanoporetech/dorado)
 
-Converts ONT raw .pod5 files into unaligned .ubam reads. Here we will generate an unaligned BAM file (.ubam) as we are not directly mapping the sequencing data to a reference genome file.
+Converts ONT raw .pod5 files into unaligned .ubam reads. Here, we will generate an unaligned BAM file (.ubam) as we are not directly mapping the sequencing data to a reference genome file.
 
 - input: *.pod5
 - output: .ubam
@@ -39,7 +39,7 @@ dorado basecaller --emit-moves --estimate-poly-a sup,m5C,inosine_m6A,pseU /pathT
 ```
 
 <a name="file_format"></a>
-### 1.2. samtools - ubam to fastq [https://www.htslib.org/doc/samtools.html]
+### 1.2. [samtools](https://www.htslib.org/doc/samtools.html) - ubam to fastq
 
 Convert .ubam basecalled reads into .fastq format.
 
@@ -67,20 +67,21 @@ minimap2 -ax map-ont rna_cs_control.fasta your_raw_reads.fasta > cs_mapped.sam
 ```
 
 **(3) Extract read IDs**
-First column in a SAM file holds the read ID and the 5th column holds the mapping quality (MAPQ). This command checks the first column that it is not a header row (starts with @) and checks each 5th row if it is greater than 0. From all rows complying to these conditions the read ID is written into a txt file.
-For more info on SAM file format see here [`README_file_formats.md`](README_file_formats.md)
+First column in a SAM file holds the read ID, and the 5th column holds the mapping quality (MAPQ). This command checks the first column to ensure it is not a header row (starts with @) and checks each 5th row to see if it is greater than 0. From all rows complying with these conditions, the read ID is written into a TXT file.
+
 ```
 awk '$1 !~ /^@/ && $5 > 0 {print $1}' cs_mapped.sam > read_ids.txt
 ```
 
 **(4) Exclude read IDs from the raw sequencing data with [seqkit](https://github.com/shenwei356/seqkit)**
 Use seqkit to keep all raw reads whose read ID matches any in the read_id.txt file.
+
 ```
 seqkit grep -v -f read_ids.txt raw_reads.fastq -o raw_reads_filtered.fastq
 ```
 
 <a name="#pycoQC"></a>
-### 1.4. pycoQC [https://a-slide.github.io/pycoQC/installation/]
+### 1.4. [pycoQC](https://a-slide.github.io/pycoQC/installation/)
 
 Generate interactive QC metrics and plots from ONT sequencing summary files.
 
@@ -94,7 +95,7 @@ pycoQC --summary file sequencing_summary.txt -o pycoQC_output.html
 Another useful tool to use for this case is [NanoPlot](https://github.com/wdecoster/NanoPlot).
 
 <a name="phred_filter"></a>
-### 1.5. chopper - Filtering based on PHRED-score [https://github.com/wdecoster/chopper]
+### 1.5. [chopper](https://github.com/wdecoster/chopper) - Filtering based on PHRED-score
 
 Filters sequencing reads based on mean PHRED quality score thresholds or other parameters.
 
@@ -107,7 +108,7 @@ gunzip –c xxx.fastq.gz | chopper --quality 10 --threads 18 --input | gzip xxx_
 ```
 
 <a name="nanoComp"></a>
-### 1.6. NanoComp [https://github.com/wdecoster/nanocomp]
+### 1.6. [NanoComp](https://github.com/wdecoster/nanocomp)
 
 Compare multiple ONT sequencing runs or datasets based on QC metrics.
 
@@ -118,12 +119,12 @@ NanoComp --summary xxx_summary.txt xxx_summary.txt xxx_summary.txt --names xxx_1
 ```
 
 <a name="polya"></a>
-### 1.7. Poly(A) tail trimming **[CUSTOM SCRIPT]**
+### 1.7. Poly(A) tail trimming **[/python/scripts/polyA_pattern_detection.py]**
 ONT direct RNA sequencing data includes poly(A) tails. Trimming them is not necessary when the raw reads are mapped to a reference genome, as they will be soft-clipped by minimap2. 
-But as reconstruction a transcriptome for non-model organism still is quite experimental trimming the poly(A) tails was helpful in reconstruction a de novo transcriptome without a reference genome (f.e. with rnabloom [https://github.com/bcgsc/RNA-Bloom]) as differing tail length can influence the overlap between reads.
-There are different available tools as dorado --estimate_polyA and Nanopolish which are developed to detect poly(A) tail length but poly(A) trimming was not found to be a common usage tool. 
-In this repository I provide a custom script developed during the project to detect poly(A) tail by AAA pattern and to trim the sequences with this knowledge. It is important to not that this is not a validated tool. The python script relies on the idea of detecting a AAAA pattern of a specified length (default=10). Patterns are detected at the beginning, the middle, and at the end of reads. Redundant detections of middle pattern detections with the start and end detection are removed. Start and end patterns are simply trimmed off. Middle patterns are checked if they are followed by a nucleotide sequence of < 20nt and then they are always considered as poly(A) end patterns. (This ic because it was noticed that more than a few reads showed poly(A) middle patterns which seemd to be tails as they were follwed by a small number of not A nucleotides)
-It is important to notice that this is not a validated script, but it was tested by the best knowledge with the data in this project and in these cases produced reliable detection and trimming.
+But as reconstruction of a transcriptome for a non-model organism still is quite experimental, trimming the poly(A) tails helped reconstruct a de novo transcriptome without a reference genome (e.g., with RNAbloom [https://github.com/bcgsc/RNA-Bloom]), as differing tail length can influence the overlap between reads.
+There are different available tools, such as dorado --estimate_polyA and Nanopolish, which are developed to detect poly(A) tail length, but poly(A) trimming was not found to be a common usage tool. 
+In this repository, I provide a custom script developed during the project to detect poly(A) tail by AAA pattern and to trim the sequences with this knowledge. It is important to note that this is not a validated tool. The python script relies on the idea of detecting a AAAA pattern of a specified length (default=10). Patterns are detected at the beginning, the middle, and the end of reads. Redundant detections of middle pattern detections with the start and end detection are removed. Start and end patterns are simply trimmed off. Middle patterns are checked if they are followed by a nucleotide sequence of < 20nt, and then they are always considered as poly(A) end patterns. (This is because it was noticed that more than a few reads showed poly(A) middle patterns, which seemed to be tails as they were followed by a small number of not A nucleotides)
+It is important to notice that this is not a validated script, but it was tested by the best knowledge with the data in this project, and in these cases, it produced reliable detection and trimming.
 
 - input: raw_reads.fastq
 - output: overview.tsv, raw_reads_noA.fasta
@@ -133,10 +134,10 @@ python detect_and_trim_polyA.py raw_read.fastq
 ```
 
 <a name="rep_pat"></a>
-### 1.8. Repetitive Pattern Detection **[CUSTOM SCRIPT]**
-ONT direct RNA sequencing generated in our sequenicng run reads showing repetitive pattern with lengths up to 500k bp. As these repetitive pattern do not hold any valuable infrmation for us and it was noticed that they do influence the mapping of the raw reads to the reference genome, it was decided to exclude reads showing a repetitive pattern.
-This is a simple script for detecting different repetitive pattern (f.e. 'AGAGA', 'CTCTC', etc.) of a min length (default=15) and extracting their read ids into a .txt file. 
-It should be noted that for our sequencing runs an exclusion of these reads showing a repetitive pattern was doable as only ~20% of a total of ~24M reads were removed. This should be decided individually for each seqeuncing run.
+### 1.8. Repetitive Pattern Detection **[/python/scripts/repetitive_pattern_detection.py]**
+ONT direct RNA sequencing generated in our sequencing run reads showing repetitive pattern with lengths up to 500k bp. As these repetitive patterns do not contain valuable information for us, and it was observed that they do influence the mapping of the raw reads to the reference genome, it was decided to exclude reads that show a repetitive pattern.
+This is a simple script for detecting different repetitive patterns (e.g., 'AGAGA', 'CTCTC', etc.) of a minimum length (default=15) and extracting their read IDs into a .txt file. 
+It should be noted that for our sequencing runs, excluding these reads showing a repetitive pattern was feasible, as only ~20% of the total of ~24 million reads were removed. This should be decided individually for each sequencing run.
 
 - input: raw_reads.fastq / raw_reads.fasta
 - output: read_ids.txt
@@ -154,7 +155,7 @@ seqkit grep -v -f read_ids.txt raw_reads.fastq -o raw_reads_noR.fastq
 ## 2. Nextflow Pipeline - Implemented Tool Commands 
 ## Transcriptome Reconstruction & Annotation
 
-As the reconstruction and analyses of biological data can be very individual and also provide the user with the knowledge of how every step was used and in what order, all commands implemented into the NextFlow pipeline are listed in this README. With this, it is also easy to follow each step and/or use one or more steps individually if necessary. 
+As the reconstruction and analysis of biological data can be very individual and also provide the user with insights into how every step was used and in what order, all commands implemented into the NextFlow pipeline are listed in this README. With this, it is also easy to follow each step and/or use one or more steps individually if necessary. 
 
 #### **Commands implemented into the pipeline:**
 
@@ -186,7 +187,7 @@ gffread -w xxx_transcripts.fa -g xxx_genome.fa stringtie2_xxx_transcripts.gtf
 <a name="cano"></a>
 ## 2.4 Choosing the Canonical Transcriptome
 
-One representative (canonical) transcript per gene ID is chosen. Here for each gene ID, the isoform with the highest nucleotide coverage (i.e., the most bases supported by aligned reads) was selected as the canonical transcript. This is done with a bustom script.
+One representative (canonical) transcript per gene ID is chosen. Here for each gene ID, the isoform with the highest nucleotide coverage (i.e., the most bases supported by aligned reads) was selected as the canonical transcript. This is done with a custom script.
 
 ```
 # 4. choose the canonical transcripts
