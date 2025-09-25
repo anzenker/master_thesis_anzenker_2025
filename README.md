@@ -50,10 +50,10 @@ The ms-pipeline is designed to assemble and annotate transcriptomes from Oxford 
 
 It integrates several key steps:	
 
-•	Transcriptome reconstruction with StringTie2,	
-•	Completeness assessment with BUSCO Vertebrata to evaluate the presence of conserved orthologs,	
-•	Open Reading Frame (ORF) prediction with TransDecoder to identify whether transcripts encode complete or partial proteins, and	
-•	Functional annotation with eggNOG to provide an initial overview of transcriptome functionality. 
+- Transcriptome reconstruction with StringTie2,
+- Completeness assessment with BUSCO Vertebrata to evaluate the presence of conserved orthologs,
+- Open Reading Frame (ORF) prediction with TransDecoder to identify whether transcripts encode complete or partial proteins, and
+- Functional annotation with eggNOG to provide an initial overview of transcriptome functionality. 
 
 Together, these steps provide a reproducible and user-friendly workflow for assembling transcriptomes from ONT dRNA-seq data and placing them directly into a functional context.
 
@@ -77,8 +77,9 @@ These tools are needed to set up the environment and run the pipeline.
 - **[nextflow](https://www.nextflow.io/docs/latest/install.html)**: Workflow manager to run the analysis pipeline in a reproducible way.
 - **[docker](https://docs.docker.com/engine/install/ubuntu/)**: Allows to run software in containers. Required for using the provided Docker Image [anzenker/ms-pipeline](https://hub.docker.com/repository/docker/anzenker/ms-pipeline/).
 
-**Download and prepare necessary databases for the pipeline:**
-The databases only need to be downloaded if these steps are to be executed with the workflow. The pipeline resolves the local path `/bin` at runtime
+> [!IMPORTANT]
+> **Download and prepare necessary databases for the pipeline:**
+> The databases only need to be downloaded if these steps are to be executed with the workflow. The pipeline resolves the local path `/bin` at runtime
 
 - **EggNOG** (~13G & ~9G & ~7G)
 ```
@@ -120,8 +121,9 @@ nextflow run anzenker/master_thesis_anzenker_2025 -r main --help
 #run
 nextflow run anzenker/master_thesis_anzenker_2025 -r main --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS
 ```
-**Quickstart - Run pipeline without eggNOG & BUSCO database download**
-Information: This quick run will use a small test dataset from another repository.
+> [!Tip]
+> Try the **Quickstart - Run pipeline without eggNOG & BUSCO database download**
+> Information: This quick run will use a small test dataset from another repository.
 ```
 nextflow run anzenker/master_thesis_anzenker_2025/ -r main -entry test -profile test
 ```
