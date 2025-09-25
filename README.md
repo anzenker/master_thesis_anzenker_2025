@@ -13,7 +13,7 @@
       + 3.2.4 [ ms-pipeline results directory (dict) ](#dict)
       + 3.2.5 [ Code implemented into the ms-pipeline (code) ](#code)
     + 3.3 [ Additional Annoation with BLAST (addanno) ](#addanno)
-      + 3.3.1 [ UniProt annotation (uniprot) (uniprot) ] (#uniprot)
+      + 3.3.1 [ UniProt annotation (uniprot) (uniprot) ](#uniprot)
  4. [ Links to software tools for manual installation (soft)](#soft)
 
 ###### ================================================================================
