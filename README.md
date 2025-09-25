@@ -122,13 +122,16 @@ nextflow run anzenker/master_thesis_anzenker_2025 -r main --help
 #run
 nextflow run anzenker/master_thesis_anzenker_2025 -r main --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS
 ```
+_(With ~24M ONT raw reads (~19 GB) and a reference genome of ~2.1 GB, the full pipeline ran in ~5.5 hours on a system with 18 CPU threads. Runtime may vary depending on input size and hardware.)_
+
+
 > [!Tip]
 > Try the **Quickstart - Run pipeline without eggNOG & BUSCO database download**
 > Information: This quick run will use a small test dataset from another repository.
 ```
 nextflow run anzenker/master_thesis_anzenker_2025/ -r main -entry test -profile test
 ```
-(runtime ~2 min, runs without BUSCO/eggNOG)
+_(runtime ~2 min, runs without BUSCO/eggNOG)_
 
 **Optional parameters**
 - --outdir NAME     (defines the name of the output directory) 
