@@ -72,7 +72,8 @@ This makes ms-pipeline an additional solution for ONT direct RNA-seq data, combi
 
 <a name="install"></a>
 ### 3.2.1 Installation Requirements
-These tools are needed to set up the environment and run the pipeline.
+> [!Important]
+> These tools nextflow & docker must be installed to run the pipeline.
 
 - **[nextflow](https://www.nextflow.io/docs/latest/install.html)**: Workflow manager to run the analysis pipeline in a reproducible way.
 - **[docker](https://docs.docker.com/engine/install/ubuntu/)**: Allows to run software in containers. Required for using the provided Docker Image [anzenker/ms-pipeline](https://hub.docker.com/repository/docker/anzenker/ms-pipeline/).
