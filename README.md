@@ -60,7 +60,7 @@ Together, these steps provide a reproducible and user-friendly workflow for asse
 The ms-pipeline originates from a Master’s thesis project studying hybridization effects in the parthenogenetic species *Aspidoscelis (A.) neomexicanus* and its sexual parental species, *A. marmoratus* and *A. arizonae*. Since assembling a single transcriptome involves more than one time-consuming step, the aim was to combine and automate most of the process for efficient analysis of multiple tissue samples, species, and replicates. It allows quicker and standardized transcriptome assembly and assessment, preparing the data for downstream analyses.
 
 **Comparison to existing workflows**
-The ms-pipeline shared similarities with [wf-transcriptome](https://github.com/nanoporetech/wf-transcriptome), which also uses minimap2 and StringTie2 for reference-guided reconstruction and additonally provides differential expression analysis. However, it does not offer functional annotation or completeness assessment. 
+The ms-pipeline shares similarities with [wf-transcriptome](https://github.com/nanoporetech/wf-transcriptome), which also uses minimap2 and StringTie2 for reference-guided reconstruction and additonally provides differential expression analysis. The ms-pipeline does not offer differential expression analysis.
 
 In contrast, the ms-pipeline integrates:
 - **BUSCO** for evaluating transcriptome completeness,
