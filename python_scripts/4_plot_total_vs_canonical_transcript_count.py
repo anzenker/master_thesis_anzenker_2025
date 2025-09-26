@@ -84,7 +84,7 @@ def plot_transcript_counts(df: pd.DataFrame, output_path: str, color_map: dict):
 
     # Save
     fig = os.path.join(output_path, "4_plot_total_vs_canonical_counts.png")
-    plt.savefig(fig)
+    plt.savefig(fig, dpi=500)
     print(f"Plot saved to: {fig}")
 
     plt.close()
