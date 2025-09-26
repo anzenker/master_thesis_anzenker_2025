@@ -31,7 +31,7 @@ This guide is separated into 3 Parts:
 ###### -------------------------------------------------------------------------------------------------------------------------
 <a name="OS"></a>
 ## 2. Hardware and Operating System 
-All steps except dorado basecalling were successfully executed on Linux-based systems with an x86_64 architecture.
+All steps except dorado basecalling were tested on Linux-based systems with an x86_64 architecture.
 
 Dorado basecalling was executed on Linux-based systems (x86_64) equipped either with NVIDIA RTX 6000 Ada Generation or NVIDIA Tesla V100-DGXS-32GB GPUs.
 
@@ -183,7 +183,7 @@ To generate a broader functional annotation of the Transcriptome.
 <a name="uniprot"></a>
 ### 3.3.1 UniProt annotation 
 
-### Download and make database locally
+### Download and Build local UniProt database
 ```
 UniProt link to database:
 https://www.uniprot.org/help/downloads
