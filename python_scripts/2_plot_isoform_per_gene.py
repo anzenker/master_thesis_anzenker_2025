@@ -140,7 +140,7 @@ def plot_isoform_per_gene(transcript_df, plot_color, filename, output_path):
 
     # Save
     fig_1 = os.path.join(output_path, f"2_isoform_per_gene_barplot.png")
-    plt.savefig(fig_1)
+    plt.savefig(fig_1, dpi=500)
     print(f"Plot saved to: {fig_1}")
     #plt.close()
     
