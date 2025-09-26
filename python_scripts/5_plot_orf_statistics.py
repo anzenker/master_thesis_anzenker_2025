@@ -101,7 +101,7 @@ def plot_grouped_from_pivot(pivot_df: pd.DataFrame, colors_map: dict, output_pat
 
     # Save
     fig = os.path.join(output_path, "5_plot_orf_statistics.png")
-    plt.savefig(fig)
+    plt.savefig(fig, dpi=500)
     print(f"Plot saved to: {fig}")
 
     plt.close()
