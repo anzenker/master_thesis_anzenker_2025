@@ -11,7 +11,7 @@
       + 3.2.2 [ Run the ms-pipeline (run) ](#run)
       + 3.2.3 [ ms-pipeline flowchart overview (flowchart) ](#flowchart)
       + 3.2.4 [ ms-pipeline results directory (dict) ](#dict)
-      + 3.2.5 [ Code implemented into the ms-pipeline (code) ](#code)
+      + 3.2.5 [ Tools and scripts included in the ms-pipeline (code) ](#code)
     + 3.3 [ Additional Annoation with BLAST (addanno) ](#addanno)
       + 3.3.1 [ UniProt annotation (uniprot) (uniprot) ](#uniprot)
  4. [ Links to software tools for manual installation (soft)](#soft)
@@ -174,8 +174,8 @@ An exemplary description of the output files and output plots can be found here:
 ```
 
 <a name="code"></a>
-### 3.2.5 Code implemented into the ms-pipeline
-All code implemented into the pipeline can be found in [commands.md](/docs/commands.md) for manual execution.
+### 3.2.5 Tools and scripts included in the the ms-pipeline
+All tools and scripts included in the pipeline can be found in [commands.md](/docs/commands.md) for manual execution.
 
 <a name="addanno"></a>
 ## 3.3. Additional Annotation
