@@ -117,7 +117,7 @@ def pipeline_plot_transcriptome_quality_overview(species_name, species_color, co
 
     # Save
     fig = os.path.join(output_path, "pipeline_transcriptome_quality_overview_functionality.png")
-    plt.savefig(fig)
+    plt.savefig(fig, dpi=500)
     print(f"Plot saved to: {fig}")
     
     plt.close()
