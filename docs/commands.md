@@ -144,7 +144,7 @@ It should be noted that for our sequencing runs, excluding these reads showing a
 
 ```
 # this can also be done on fasta file format
-python detect_and_trim_polyA.py raw_reads.fastq
+python repetitive_pattern_detection.py raw_reads.fastq
 
 seqkit grep -v -f read_ids.txt raw_reads.fastq -o raw_reads_noR.fastq
 ```
