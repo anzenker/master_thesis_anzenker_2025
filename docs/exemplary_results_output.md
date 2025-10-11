@@ -25,11 +25,11 @@
 
 <a name="two"></a>
 ### 2. stringtie2Transcriptome
-- GTF file of total Transcriptome
+- GTF file of the total Transcriptome
 
 <a name="three"></a>
 ### 3. gffreadToFasta
-- FASTA file of total Transcriptome
+- FASTA file of the total Transcriptome
 
 <a name="four"></a>
 ### 4. canonicalBestCov
@@ -39,8 +39,8 @@
 
 <a name="five"></a>
 ### 5. transDecoderORF
-Only done with canonical Transcriptome.
-- PEP file with longest predicted ORFs
+Only done with the canonical Transcriptome.
+- PEP file with the longest predicted ORFs
 
 <a name="six"></a>
 ### 6. buscoVertebrataCompleteness
