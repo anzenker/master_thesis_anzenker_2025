@@ -12,7 +12,7 @@
       + 3.2.3 [ ms-pipeline flowchart overview (flowchart) ](#flowchart)
       + 3.2.4 [ ms-pipeline results directory (dict) ](#dict)
       + 3.2.5 [ Tools and scripts included in the ms-pipeline (code) ](#code)
-    + 3.3 [ Additional Annoation with BLAST (addanno) ](#addanno)
+    + 3.3 [ Additional Annotation with BLAST (addanno) ](#addanno)
       + 3.3.1 [ UniProt annotation (uniprot) (uniprot) ](#uniprot)
  4. [ Links to software tools for manual installation (soft)](#soft)
 
@@ -23,7 +23,7 @@
 ## 1. This Repository
 This repository provides a step-by-step guide for assembling and annotating a transcriptome from Oxford Nanopore direct RNA sequencing (dRNA-seq) data using a reference genome. It includes an initial functional assessment of the transcriptome, laying the foundation for reproducible analyses across different tissues, species, and replicates.
 
-This guide is separated into 3 Parts:
+This guide is divided into 3 Parts:
 1. Basecalling & Preprocessing of the Raw Sequencing Data
 2. ms-pipeline: Transcriptome Assembly & Functional Assessment
 3. Additional Annotation via BLAST/UniProt
@@ -41,7 +41,7 @@ Dorado basecalling was executed on Linux-based systems (x86_64) equipped either 
 
 <a name="prepros"></a>
 ## 3.1. Basecalling & Preprocessing
-Basecalling and Preprocessing can be accomplished in different approaches. A useful approach for this is described in detail in [commands.md](/docs/commands.md).
+Basecalling and Preprocessing can be accomplished in different approaches. A helpful approach for this is described in detail in [commands.md](/docs/commands.md).
 
 <a name="ms-pipeline"></a>
 ## 3.2. ms-pipeline (Master Thesis Pipeline)
@@ -58,17 +58,6 @@ It integrates several key steps:
 Together, these steps provide a reproducible and user-friendly workflow for assembling transcriptomes from ONT dRNA-seq data and placing them directly into a functional context.
 
 The ms-pipeline originates from a Master’s thesis project studying hybridization effects in the parthenogenetic species *Aspidoscelis (A.) neomexicanus* and its sexual parental species, *A. marmoratus* and *A. arizonae*. Since assembling a single transcriptome involves more than one time-consuming step, the aim was to combine and automate most of the process for efficient analysis of multiple tissue samples, species, and replicates. It allows quicker and standardized transcriptome assembly and assessment, preparing the data for downstream analyses.
-
-**Comparison to existing workflows**
-The ms-pipeline shares similarities with [wf-transcriptome](https://github.com/nanoporetech/wf-transcriptome), which also uses minimap2 and StringTie2 for reference-guided reconstruction and additonally provides differential expression analysis. The ms-pipeline does not offer differential expression analysis.
-
-In contrast, the ms-pipeline integrates:
-- **BUSCO** for evaluating transcriptome completeness,
-- **TransDecoder** for ORF prediction,
-- **eggNOG** for functional annotation,
-- and a set of **summary plots** for functional assessment and isoform assessment.  
-
-This makes ms-pipeline an additional solution for ONT direct RNA-seq data, combining assembly, completeness, and functional assessment in a single reproducible workflow.
 
 <a name="install"></a>
 ### 3.2.1 Installation Requirements
@@ -122,7 +111,7 @@ nextflow run anzenker/master_thesis_anzenker_2025 -r main --help
 #run
 nextflow run anzenker/master_thesis_anzenker_2025 -r main --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS
 ```
-_(With ~24M ONT raw reads (~19 GB) and a reference genome of ~2.1 GB, the full pipeline ran in ~5.5 hours on a system with 18 CPU threads. Runtime may vary depending on input size and hardware.)_
+_(With ~24M ONT raw reads (~19 GB) and a reference genome of ~2.1 GB, the entire pipeline ran in ~5.5 hours on a system with 18 CPU threads. Runtime may vary depending on input size and hardware.)_
 
 
 > [!Tip]
@@ -174,7 +163,7 @@ An exemplary description of the output files and output plots can be found here:
 ```
 
 <a name="code"></a>
-### 3.2.5 Tools and scripts included in the the ms-pipeline
+### 3.2.5 Tools and scripts included in the ms-pipeline
 All tools and scripts included in the pipeline can be found in [commands.md](/docs/commands.md) for manual execution.
 
 <a name="addanno"></a>
