@@ -19,7 +19,7 @@
     * 2.4. [ Choosing the Canonical Transcriptome ](#cano)
     * 2.5. [ BUSCO - Vertebrata Ortholog Assessment ](#busco)
     * 2.5. [ TransDecoder - ORF Prediction ](#transdec)
-    * 2.6. [ eggNOG Annotation] (#eggnog)
+    * 2.6. [ eggNOG Annotation](#eggnog)
     * 2.7. [ Custom Python Scripts - Visualization of some initial Results ](#python)
   
 ###### ================================================================================
