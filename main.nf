@@ -6,7 +6,7 @@ params.help = false
 params.outdir = 'RESULTS'
 params.threads = 1
 params.species_name = null
-params.color = "#C79FEF" //lilac
+params.color = "#b99666" //ligthbrown
 params.skip_eggnog = false
 params.skip_busco = false
 params.skip_orf = false
@@ -41,31 +41,6 @@ def helpMessage() {
             --skip_plots true             No output plot will be generated.
 
         """.stripIndent()
-}
-
-
-/*
- * Parse software version numbers
- */
-process get_software_versions {
-
-    output:
-    file 'software_versions.txt'
-
-    script:
-    """
-    conda --version         > software_versions.txt
-    busco --version         >> software_versions.txt 2>&1
-    seqkit --version        >> software_versions.txt 2>&1
-    python --version        >> software_versions.txt 2>&1
-    pip --version           >> software_versions.txt 2>&1
-    stringtie --version     >> software_versions.txt 2>&1
-    gffread --version       >> software_versions.txt 2>&1
-    minimap2 --version      >> software_versions.txt 2>&1
-    samtools --version      >> software_versions.txt 2>&1
-    TransDecoder.LongOrfs   >> software_versions.txt 2>&1
-    emapper.py --version    >> software_versions.txt 2>&1
-    """
 }
 
 process buscoVertebrataCompleteness {
