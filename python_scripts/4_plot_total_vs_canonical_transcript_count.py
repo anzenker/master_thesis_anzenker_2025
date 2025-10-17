@@ -3,13 +3,6 @@ import argparse, textwrap, os, gzip
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# ---------- helpers ----------
-
-SPECIES_COLORS = {
-    "A. marmoratus":  "#b99666",
-    "A. arizonae":    "#1469A7",
-    "A. neomexicanus":"#688e26",
-}
 
 def count_fasta_headers(path: str) -> int:
     #count sequences by '>' header
@@ -30,9 +23,6 @@ def summarize_species_counts(species: str, fasta: str, canonical_fasta: str) -> 
         columns=["Total", "Count", "Species"]
     )
     return df
-
-def default_color_for(species: str) -> str:
-    return SPECIES_COLORS.get(species.strip(), "#C79FEF")
 
 def plot_transcript_counts(df: pd.DataFrame, output_path: str, color_map: dict):
     # order species as they appear
@@ -117,24 +107,61 @@ def main():
     p.add_argument("--output_path", help="Output path/folder")
     args = p.parse_args()
 
+     #set colors per species
+    if args.plot_color1 is not None:
+        col1 = args.plot_color1
+    elif args.species_name1 == "A. marmoratus":
+        col1 = "#b99666"
+    elif args.species_name1 == "A. arizonae":
+        col1 = "#1469A7"      
+    elif args.species_name1 == "A. neomexicanus":
+        col1 = "#688e26"
+    else:
+        col1 = "#b99666"
+    
+    if args.input_fasta2 is not None:
+        if args.plot_color2 is not None:
+            col2 = args.plot_color2
+        elif args.species_name2 == "A. marmoratus":
+            col2 = "#b99666"
+        elif args.species_name2 == "A. arizonae":
+            col2 = "#1469A7"      
+        elif args.species_name2 == "A. neomexicanus":
+            col2 = "#688e26"
+        else:
+            col2 = "#b99666"
+    
+    if args.input_fasta3 is not None:
+        if args.plot_color3 is not None:
+            col3 = args.plot_color3
+        elif args.species_name3 == "A. marmoratus":
+            col3 = "#b99666"
+        elif args.species_name3 == "A. arizonae":
+            col3 = "#1469A7"      
+        elif args.species_name3 == "A. neomexicanus":
+            col3 = "#688e26"
+        else:
+            col3 = "#b99666"
+
+    
     data, color_map = [], {}
 
     # s1
     sp1 = args.species1 or "Species1"
     data.append((sp1, args.fasta1, args.canonical1))
-    color_map[sp1] = args.color1 or default_color_for(sp1)
+    color_map[sp1] = col1
 
     # s2
     if args.fasta2 and args.canonical2:
         sp2 = args.species2 or "Species2"
         data.append((sp2, args.fasta2, args.canonical2))
-        color_map[sp2] = args.color2 or default_color_for(sp2)
+        color_map[sp2] = col2
 
     # s3
     if args.fasta3 and args.canonical3:
         sp3 = args.species3 or "Species3"
         data.append((sp3, args.fasta3, args.canonical3))
-        color_map[sp3] = args.color3 or default_color_for(sp3)
+        color_map[sp3] = col3
 
     # put data into df
     species = [summarize_species_counts(species, fasta_all, canonical) for species, fasta_all, canonical in data]
