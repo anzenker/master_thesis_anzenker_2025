@@ -3,14 +3,12 @@ import argparse
 import re
 
 def clean_id(qid: str) -> str:
-    """Drop trailing .p# on peptide IDs (e.g., foo.p1 -> foo)."""
+    # remove .p1 suffix from IDs
     return re.sub(r"\.p\d+$", "", qid.strip())
 
 def load_eggnog_map(path: str) -> dict:
-    """
-    Map query -> {'eggnog_taxa': 'xxxx', 'eggnog_id': 'YYY'}
-    Accepts .annotations or .hits. Uses first two tab columns.
-    """
+    # uses first two columns from eggnog (.annotations or .hits) file
+    # extracts annotation info per transcript ID
     m = {}
     with open(path) as fh:
         for line in fh:
@@ -23,10 +21,8 @@ def load_eggnog_map(path: str) -> dict:
     return m
 
 def load_blast_map(path: str) -> dict:
-    """
-    Map query -> {'blast_db': 'sp', 'blast_id': 'Q9XXX', 'blast_name': 'NAME'}
-    Assumes outfmt6 col1 looks like db|ACC|NAME (fallbacks if not).
-    """
+    # extract first two columns from blast.outmt6 (query, subject)
+    # split subject into DB name, annotation ID and annotation name
     m = {}
     with open(path) as fh:
         for line in fh:
@@ -42,12 +38,9 @@ def load_blast_map(path: str) -> dict:
             m[q] = {"blast_db": db, "blast_id": acc, "blast_name": name}
     return m
 
-# ----------------- GFF3 attr parsing -----------------
-
 def parse_gff_attrs(attr_str: str) -> dict:
-    """
-    Parse GFF3 attributes 'key=value;key=value;...' into dict (no URL-decoding).
-    """
+    # expand GFF attributes
+    # extract present attr into dict like --> {attr: ID}
     attrs = {}
     for field in attr_str.strip().strip(";").split(";"):
         field = field.strip()
@@ -61,7 +54,7 @@ def parse_gff_attrs(attr_str: str) -> dict:
     return attrs
 
 def gff_attrs_to_str(attrs: dict) -> str:
-    # deterministic order
+    # 
     return ";".join([f"{k}={v}" if v != "" else k for k, v in sorted(attrs.items())])
 
 
