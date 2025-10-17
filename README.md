@@ -62,9 +62,9 @@ The ms-pipeline originates from a Master’s thesis project studying hybridizati
 <a name="install"></a>
 ### 3.2.1 Installation Requirements
 > [!Important]
-> The tools **nextflow & docker** must be installed to run the pipeline.
+> The tools **Nextflow & docker** must be installed to run the pipeline.
 
-- **[nextflow](https://www.nextflow.io/docs/latest/install.html)**: Workflow manager to run the analysis pipeline in a reproducible way.
+- **[Nextflow](https://www.Nextflow.io/docs/latest/install.html)**: Workflow manager to run the analysis pipeline in a reproducible way.
 - **[docker](https://docs.docker.com/engine/install/ubuntu/)**: Allows to run software in containers. Required for using the provided Docker Image [anzenker/ms-pipeline](https://hub.docker.com/repository/docker/anzenker/ms-pipeline/).
 
 > [!IMPORTANT]
@@ -102,14 +102,14 @@ tar -xzf vertebrata_odb10.2024-01-08.tar.gz
 
 <a name="run"></a>
 ### 3.2.2 Run the ms-pipeline
-The nextflow pipeline runs on a Docker image by default.
+The Nextflow pipeline runs on a Docker image by default.
 
 ```
 # help message
-nextflow run anzenker/master_thesis_anzenker_2025 -r main --help
+Nextflow run anzenker/master_thesis_anzenker_2025 -r main --help
 
 #run
-nextflow run anzenker/master_thesis_anzenker_2025 -r main --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS
+Nextflow run anzenker/master_thesis_anzenker_2025 -r main --raw_reads raw_reads.fastq --genome genome.fa --threads NO_THREADS
 ```
 _(With ~24M ONT raw reads (~19 GB) and a reference genome of ~2.1 GB, the entire pipeline ran in ~5.5 hours on a system with 18 CPU threads. Runtime may vary depending on input size and hardware.)_
 
@@ -118,7 +118,7 @@ _(With ~24M ONT raw reads (~19 GB) and a reference genome of ~2.1 GB, the entire
 > Try the **Quickstart - Run pipeline without eggNOG & BUSCO database download**
 > Information: This quick run will use a small test dataset from another repository.
 ```
-nextflow run anzenker/master_thesis_anzenker_2025/ -r main -entry test -profile test
+Nextflow run anzenker/master_thesis_anzenker_2025/ -r main -entry test -profile test
 ```
 _(runtime ~2 min, runs without BUSCO/eggNOG)_
 
@@ -132,7 +132,7 @@ _(runtime ~2 min, runs without BUSCO/eggNOG)_
 
 <a name="flowchart"></a>
 ### 3.2.3 ms-pipeline flowchart overview
-![ms_pipeline_flowchart.png](/images/workflow_pipeline.png)
+![ms_pipeline_flowchart.png](/images/workflow_pipeline.png){50%}
 
 An exemplary description of the output files and output plots can be found here: [exemplary_results_output.md](/docs/exemplary_results_output.md)
 
