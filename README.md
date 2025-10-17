@@ -134,7 +134,7 @@ _(runtime ~2 min, runs without BUSCO/eggNOG)_
 ### 3.2.3 ms-pipeline flowchart overview
 
 <p align="center">
-  <img src="/images/workflow_pipeline.png" width="600">
+  <img src="/images/workflow_pipeline.png" width="500">
 </p>
 
 An exemplary description of the output files and output plots can be found here: [exemplary_results_output.md](/docs/exemplary_results_output.md)
