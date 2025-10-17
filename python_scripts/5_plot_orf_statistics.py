@@ -6,12 +6,7 @@ import argparse, textwrap, os
 import pandas as pd
 
 def parse_one_species(fasta_path: str, pep_path: str):
-    """
-    Returns:
-      total_transcripts, with_orf_count, orf_type_counter
-      where orf_type_counter maps:
-        {'complete', '5prime_partial', '3prime_partial', 'internal'} -> counts
-    """
+    # returns orf categories (complete, 5', 3', internal) from TransDecoder
     total_transcripts = sum(1 for line in open(fasta_path) if line.startswith(">"))
 
     # collect all ORFs per transcript base id
@@ -23,14 +18,16 @@ def parse_one_species(fasta_path: str, pep_path: str):
             if part.startswith("type:"):
                 orf_type = part.split(":", 1)[1]
                 break
-        base_tid = rec.id.rsplit(".", 1)[0]  # AC73_xxx.p1 -> AC73_xxx
+        # remove .p1 suffix (AC73_xxx.p1 -> AC73_xxx)
+        base_tid = rec.id.rsplit(".", 1)[0]  
         orf_dict[base_tid].append((orf_type, len(rec.seq)))
 
     # keep the longest ORF per transcript & count types
     longest_orf_per_tx = {}
     orf_type_counter = Counter()
     for tid, orfs in orf_dict.items():
-        best = max(orfs, key=lambda x: x[1])     # choose longest
+        # longest
+        best = max(orfs, key=lambda x: x[1])    
         longest_orf_per_tx[tid] = best
         orf_type_counter[best[0]] += 1
 
@@ -39,7 +36,6 @@ def parse_one_species(fasta_path: str, pep_path: str):
 
 def summarize_species_row(species: str, fasta: str, pep: str):
     total, with_orf, c = parse_one_species(fasta, pep)
-    # Normalize TransDecoder keys -> compact column names
     row = {
         "species": species,
         "with_orf": with_orf,
@@ -51,15 +47,10 @@ def summarize_species_row(species: str, fasta: str, pep: str):
     }
     return row
 
-# ---------- plotting ----------
-
 def plot_grouped_from_pivot(pivot_df: pd.DataFrame, colors_map: dict, output_path: str):
-    """
-    pivot_df:   index = category ('with_orf','complete','5partial','3partial','internal')
-                columns = species
-                values = counts
-    """
-    # order categories sensibly
+    # pivot table --> index = orf category, columns = species, values = counts
+
+    # order categories
     order = ["total_transcripts", "with_orf", "complete", "5partial", "3partial", "internal"]
     order = [c for c in order if c in pivot_df.index]
     pivot_df = pivot_df.loc[order]
@@ -107,45 +98,69 @@ def plot_grouped_from_pivot(pivot_df: pd.DataFrame, colors_map: dict, output_pat
     plt.close()
 
 def default_color_for(species: str) -> str:
-    # override here for your 3 common species
     if species.strip() == "A. marmoratus":  return "#b99666"
     if species.strip() == "A. arizonae":    return "#1469A7"
     if species.strip() == "A. neomexicanus":return "#688e26"
-    return "#C79FEF"  # fallback
+    return "#b99666"  
 
 def main():
 
-        # collect jobs (only include fully specified species)
     jobs = []
     species_order = []
     color_map = {}
 
-    def fallback_label(fasta_path: str, given: str | None, default_stub: str) -> str:
-        if given and given.strip():
-            return given
-        base = os.path.basename(fasta_path)
-        stub = base.split('.')[0] if '.' in base else base
-        return stub or default_stub
+    #set colors per species
+    if args.plot_color1 is not None:
+        col1 = args.plot_color1
+    elif args.species_name1 == "A. marmoratus":
+        col1 = "#b99666"
+    elif args.species_name1 == "A. arizonae":
+        col1 = "#1469A7"      
+    elif args.species_name1 == "A. neomexicanus":
+        col1 = "#688e26"
+    else:
+        col1 = "#b99666"
+    
+    if args.input_fasta2 is not None:
+        if args.plot_color2 is not None:
+            col2 = args.plot_color2
+        elif args.species_name2 == "A. marmoratus":
+            col2 = "#b99666"
+        elif args.species_name2 == "A. arizonae":
+            col2 = "#1469A7"      
+        elif args.species_name2 == "A. neomexicanus":
+            col2 = "#688e26"
+        else:
+            col2 = "#b99666"
+    
+    if args.input_fasta3 is not None:
+        if args.plot_color3 is not None:
+            col3 = args.plot_color3
+        elif args.species_name3 == "A. marmoratus":
+            col3 = "#b99666"
+        elif args.species_name3 == "A. arizonae":
+            col3 = "#1469A7"      
+        elif args.species_name3 == "A. neomexicanus":
+            col3 = "#688e26"
+        else:
+            col3 = "#b99666"
+    
 
-    # species 1 (required)
-    label1 = fallback_label(args.input_fasta1, args.species_name1, "species_1")
-    col1   = args.plot_color1 or default_color_for(label1)
+    label1 = str(args.species_name1) if args.species_name1 else "species1"
     species_order.append(label1)
     jobs.append((label1, args.input_fasta1, args.input_pep1, col1))
     color_map[label1] = col1
 
     # species 2 (optional – do NOT require a name)
     if args.input_fasta2 and args.input_pep2:
-        label2 = fallback_label(args.input_fasta2, args.species_name2, "species_2")
-        col2   = args.plot_color2 or default_color_for(label2)
+        label2 = str(args.species_name2) if args.species_name2 else "species2"
         species_order.append(label2)
         jobs.append((label2, args.input_fasta2, args.input_pep2, col2))
         color_map[label2] = col2
 
     # species 3 (optional)
     if args.input_fasta3 and args.input_pep3:
-        label3 = fallback_label(args.input_fasta3, args.species_name3, "species_3")
-        col3   = args.plot_color3 or default_color_for(label3)
+        label3 = str(args.species_name3) if args.species_name3 else "species3"
         species_order.append(label3)
         jobs.append((label3, args.input_fasta3, args.input_pep3, col3))
         color_map[label3] = col3
@@ -157,9 +172,9 @@ def main():
         rows.append(summarize_species_row(sp, fa, pep))
         color_map[sp] = col
 
-    # tidy table (one row per species with columns = categories)
+    # table --> one row per species with --> columns = categories
     wide_df = pd.DataFrame(rows)
-    # build tidy long form for saving/inspection if you like
+    # long form table
     long_df = wide_df.melt(
         id_vars=["species"],
         value_vars=["total_transcripts", "with_orf", "complete", "5partial", "3partial", "internal"],
@@ -175,7 +190,7 @@ def main():
     percent_pivot.loc["total_transcripts"] = 100.0
     percent_pivot = percent_pivot.round(2)
 
-    # Save
+    # save
     tab_1 = os.path.join(args.output_path, "5_orf_statistics_pivot.csv")
     tab_2 = os.path.join(args.output_path, "5_orf_statistics_long.csv")
     pivot.to_csv(tab_1)
@@ -185,24 +200,22 @@ def main():
     # plot grouped bars from pivot
     plot_grouped_from_pivot(pivot, color_map, args.output_path)
 
-    print("=== Pivot table (categories x specie(s)) ===")
+    print("Pivot table (rows = category, columns = species, values = count):")
     print(pivot)
     print(percent_pivot)
 
 
 if __name__ == "__main__":
-    # script description
     parser = argparse.ArgumentParser(description=textwrap.dedent('''\
         ... '''),
         usage='use "python %(prog)s --help" for more information',
         formatter_class=argparse.RawTextHelpFormatter)
     
-    # input files given by user 
     # required species
     parser.add_argument("input_fasta1", help="Path to Transcriptome FASTA file")
     parser.add_argument("input_pep1", help="Path to TransDecoder PEP file")
     parser.add_argument("-species_name1", help="Name of the species")
-    #the following are optional user inputs
+    # optional user inputs
     parser.add_argument("-plot_color1", help="Color for plotting in hex code")
     # optional species 2
     parser.add_argument("-input_fasta2", help="Path to Transcriptome FASTA file")
@@ -218,41 +231,6 @@ if __name__ == "__main__":
     parser.add_argument("-output_path", help="Output path/folder") 
 
     args = parser.parse_args()
-
-    if args.plot_color1 is not None:
-        plot_color1 = args.plot_color1
-    elif args.species_name1 == "A. marmoratus":
-        plot_color1 = "#b99666"
-    elif args.species_name1 == "A. arizonae":
-        plot_color1 = "#1469A7"      
-    elif args.species_name1 == "A. neomexicanus":
-        plot_color1 = "#688e26"
-    else:
-        plot_color1 = "#C79FEF"
-    
-    if args.input_fasta2 is not None:
-        if args.plot_color2 is not None:
-            plot_color2 = args.plot_color2
-        elif args.species_name2 == "A. marmoratus":
-            plot_color2 = "#b99666"
-        elif args.species_name2 == "A. arizonae":
-            plot_color2 = "#1469A7"      
-        elif args.species_name2 == "A. neomexicanus":
-            plot_color2 = "#688e26"
-        else:
-            plot_color2 = "#C79FEF"
-    
-    if args.input_fasta3 is not None:
-        if args.plot_color3 is not None:
-            plot_color3 = args.plot_color3
-        elif args.species_name3 == "A. marmoratus":
-            plot_color3 = "#b99666"
-        elif args.species_name3 == "A. arizonae":
-            plot_color3 = "#1469A7"      
-        elif args.species_name3 == "A. neomexicanus":
-            plot_color3 = "#688e26"
-        else:
-            plot_color3 = "#C79FEF"
 
 
     main()
