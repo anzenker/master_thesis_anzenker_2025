@@ -12,13 +12,13 @@ SPECIES_COLORS = {
 }
 
 def count_fasta_headers(path: str) -> int:
-    """Count sequences by '>' header, supports .gz or plain."""
-    opn = gzip.open if path.endswith(".gz") else open
-    with opn(path, "rt") as fh:
+    #count sequences by '>' header
+    open_fa = gzip.open if path.endswith(".gz") else open
+    with open_fa(path, "rt") as fh:
         return sum(1 for line in fh if line.startswith(">"))
 
 def summarize_species_counts(species: str, fasta: str, canonical_fasta: str) -> pd.DataFrame:
-    """Return 2-row dataframe for a single species: Total & Canonical counts."""
+    # df count total and canonical
     total_transcripts = count_fasta_headers(fasta)
     total_canonical   = count_fasta_headers(canonical_fasta)
 
@@ -33,8 +33,6 @@ def summarize_species_counts(species: str, fasta: str, canonical_fasta: str) -> 
 
 def default_color_for(species: str) -> str:
     return SPECIES_COLORS.get(species.strip(), "#C79FEF")
-
-# ---------- plotting ----------
 
 def plot_transcript_counts(df: pd.DataFrame, output_path: str, color_map: dict):
     # order species as they appear
@@ -62,12 +60,12 @@ def plot_transcript_counts(df: pd.DataFrame, output_path: str, color_map: dict):
     totals_by_species = pivot_df.loc["Total Count Transcripts"].to_dict()  # {species: total}
 
     
-    # annotate bars
+    # annotate bars --> outcomment if not wanted
     ymax = pivot_df.max().max() * 1.10
     ax.set_ylim(0, ymax)
     for col_idx, container in enumerate(ax.containers):
         sp = species[col_idx]
-        denom = float(totals_by_species.get(sp, 0)) or 1.0  # avoid div-by-zero
+        denom = float(totals_by_species.get(sp, 0)) or 1.0  # avoid division by 0
 
         for j, bar in enumerate(container):                 # j = category index
             count = bar.get_height()
@@ -82,7 +80,7 @@ def plot_transcript_counts(df: pd.DataFrame, output_path: str, color_map: dict):
         )
     plt.tight_layout()
 
-    # Save
+    # save
     fig = os.path.join(output_path, "4_plot_total_vs_canonical_counts.png")
     plt.savefig(fig, dpi=500)
     print(f"Plot saved to: {fig}")
@@ -90,13 +88,10 @@ def plot_transcript_counts(df: pd.DataFrame, output_path: str, color_map: dict):
     plt.close()
 
 
-# ---------- CLI ----------
-
 def main():
     p = argparse.ArgumentParser(
         description=textwrap.dedent("""\
-            Plot total vs canonical transcript counts for 1–3 species.
-            Species names are optional; fallback lilac color used if unknown.
+            ...
         """),
         formatter_class=argparse.RawTextHelpFormatter
     )
@@ -122,32 +117,32 @@ def main():
     p.add_argument("--output_path", help="Output path/folder")
     args = p.parse_args()
 
-    jobs, color_map = [], {}
+    data, color_map = [], {}
 
     # s1
     sp1 = args.species1 or "Species1"
-    jobs.append((sp1, args.fasta1, args.canonical1))
+    data.append((sp1, args.fasta1, args.canonical1))
     color_map[sp1] = args.color1 or default_color_for(sp1)
 
     # s2
     if args.fasta2 and args.canonical2:
         sp2 = args.species2 or "Species2"
-        jobs.append((sp2, args.fasta2, args.canonical2))
+        data.append((sp2, args.fasta2, args.canonical2))
         color_map[sp2] = args.color2 or default_color_for(sp2)
 
     # s3
     if args.fasta3 and args.canonical3:
         sp3 = args.species3 or "Species3"
-        jobs.append((sp3, args.fasta3, args.canonical3))
+        data.append((sp3, args.fasta3, args.canonical3))
         color_map[sp3] = args.color3 or default_color_for(sp3)
 
-    # build one DF
-    frames = [summarize_species_counts(sp, fa, can) for sp, fa, can in jobs]
-    df = pd.concat(frames, ignore_index=True)
+    # put data into df
+    species = [summarize_species_counts(species, fasta_all, canonical) for species, fasta_all, canonical in data]
+    df = pd.concat(species, ignore_index=True)
 
-    # Save
-    tab_1 = os.path.join(args.output_path, "4_total_vs_canonical_counts.csv")
-    df.to_csv(tab_1, index=False)
+    # save
+    path_tab_1 = os.path.join(args.output_path, "4_total_vs_canonical_counts.csv")
+    df.to_csv(path_tab_1, index=False)
     print(f"Saved table: {tab_1}")
 
     plot_transcript_counts(df, args.output_path, color_map)
