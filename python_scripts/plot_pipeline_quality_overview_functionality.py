@@ -16,8 +16,6 @@ def read_eggnog_into_df(eggnog_input_path):
     eggnog_ids_df = pd.concat([eggNOG_df[0], eggNOG_df[1]], axis=1)
     eggnog_ids_df.columns = ['qseqid', 'sseqid_eggNOG']
     annotated_transcript = set(eggnog_ids_df['qseqid'])
-    # extract just the transcript ID part before '.px' - make compatible also with BUSCO
-    #eggnog_ids_df['qseqid'] = eggnog_ids_df["qseqid"].str.replace(r'\.p\d+$', '', regex=True)
 
     return annotated_transcript
 
@@ -25,8 +23,6 @@ def read_busco_into_df(busco_input_path):
     # read file into DataFrame
     col_names = ['sseqid_BUSCO', 'Status', 'qseqid', 'Score', 'Length', 'OrthoDB', 'url', 'Description']
     busco_df = pd.read_csv(busco_input_path, sep='\t', comment='#', names=col_names)
-    #busco_df = busco_df.dropna()
-    #busco_df.columns = col_names
 
     busco_counts = busco_df['Status'].value_counts()
 
@@ -74,11 +70,11 @@ def parse_transdecoder_pep(input_pep):
 
 
 def pipeline_plot_transcriptome_quality_overview(species_name, species_color, count_canonical, count_orf_predicted, count_eggnog_anno, percent_busco_complete, output_path):
-    # Labels and counts
+    # labels and counts
     labels = ['Canonical', 'With ORF', 'With \n eggNOG \n Annotation']
     counts = [count_canonical, count_orf_predicted, count_eggnog_anno]
 
-    # Percentages relative to canonical
+    # percentages relative to canonical
     percentages = [
         100,
         round((count_orf_predicted / count_canonical) * 100, 2),
@@ -87,25 +83,25 @@ def pipeline_plot_transcriptome_quality_overview(species_name, species_color, co
 
     fig, ax1 = plt.subplots(figsize=(8, 6))
 
-    # Plot counts on primary y-axis
+    # plot counts on primary y-axis
     bars = ax1.bar(labels, counts, color=species_color, width=0.4)
     ax1.set_ylabel("Count Transcripts", fontsize=12)
     ax1.set_ylim(0, max(counts) * 1.2)
 
-    # Add count labels
+    # add count labels
     for bar in bars:
         height = bar.get_height()
         ax1.text(bar.get_x() + bar.get_width() / 2, height + max(counts) * 0.01,
                 f"{str(height)} \n {round((height/count_canonical)*100, 2)}%", ha='center', va='bottom', fontsize=10)
 
-    # Secondary y-axis for percentage
+    # secondary y-axis for percentage
     ax2 = ax1.twinx()
     ax2.set_ylim(ax1.get_ylim())
     ax2.set_ylabel("Percentage of BUSCOs found in Transcriptome", fontsize=12, color='gray')
     ax2.set_yticks([y / 100 * max(counts) for y in range(0, 110, 10)])
     ax2.set_yticklabels([f"{y}%" for y in range(0, 110, 10)], color='gray')
 
-    # Add BUSCO line
+    # add BUSCO line
     busco_height = percent_busco_complete / 100 * max(counts)
     ax1.bar('Complete \n BUSCOs', busco_height , width=0.4, color='gray')
     ax1.text(len(labels), busco_height + max(counts) * 0.01,
@@ -115,7 +111,7 @@ def pipeline_plot_transcriptome_quality_overview(species_name, species_color, co
     plt.title(fr"Transcriptome Quality Overview - $\it{{{species_name}}}$", fontsize=14)
     plt.tight_layout()
 
-    # Save
+    # save
     fig = os.path.join(output_path, "pipeline_transcriptome_quality_overview_functionality.png")
     plt.savefig(fig, dpi=500)
     print(f"Plot saved to: {fig}")
@@ -123,14 +119,12 @@ def pipeline_plot_transcriptome_quality_overview(species_name, species_color, co
     plt.close()
 
 
-
-
 def default_color_for(species: str) -> str:
-    # override here for your 3 common species
     if species.strip() == "A. marmoratus":  return "#b99666"
     if species.strip() == "A. arizonae":    return "#1469A7"
     if species.strip() == "A. neomexicanus":return "#688e26"
-    return "#C79FEF"  # fallback
+    # if no match 
+    return "#b99666"  
 
 def main():
 
@@ -141,8 +135,8 @@ def main():
     
     # input file
     parser.add_argument("input_gtf", help="Path to stringtie GTF file")
-    parser.add_argument("input_canonical_ids", help="Path to TXT file with IDs from Canonical Transcripts")
-    parser.add_argument("input_pep", help="Path to PEP file with Open Reading Frame Prediction")
+    parser.add_argument("input_canonical_ids", help="Path to TXT file with IDs from canonical transcripts")
+    parser.add_argument("input_pep", help="Path to PEP file with Open Reading Frame Prediction (TransDecoder)")
     parser.add_argument("input_busco", help="Path to BUSCO full_table.tsv")
     parser.add_argument("input_eggnog", help="Path to eggNOG.annotation file")
 
@@ -153,7 +147,7 @@ def main():
     if args.species_name:
         species_name = args.species_name
     else:
-        species = "Species"
+        species = "species_name"
 
     col_names = ["BUSCO_id", "Status", "Sequence", "Score", "Length", "OrthoDB", "url", "Description"]
 
