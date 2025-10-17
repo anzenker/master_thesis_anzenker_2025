@@ -11,31 +11,19 @@ import sys
 import time
 
 def open_func(input_file):
-    """
-    Opens a given input file based on with .gz ending or wihtout .gz ending.
-
-    Requires: gzip
-    """
+    #open gzip file
     return gzip.open if input_file.endswith(".gz") else open
 
 def log_print(text, log_handle):
-    """
-    Write text into a log file.
-    """
+    #logging file to keep track of run
     print(text)
 
     log_handle.write(text + "\n")
 
 def find_repetitive_patterns(sequence):
-    """
-    Find repetitive patterns in a given nucleotide sequence.
-
-    Required: re (regex)
-    """
-    # variables/...
     matches = []
 
-    # defined patterns to detect, anywhere in the sequence
+    # defined patterns to detect, ANYWHERE in the sequence
     patterns = {
         "repetitive_AC": r"(AC|CA|ACA|AAC|ACC|CAC){10,}",
         "repetitive_GT": r"(GT|TG|TGT|TGG|GTT|TGT){10,}",
@@ -60,19 +48,14 @@ def find_repetitive_patterns(sequence):
     return matches
 
 def process_sequences(input_file, output_ids_path, output_tsv_path, log_path):
-    """
-    Takes a FASTA or FASTQ file and processes each seqeucence to detect pre-defined reptitive pattern.
 
-    Required: sys, time, pandas, SeqIO
-    """
-    # variables/...
     pattern_hits = []
     hit_read_ids = set()
     total_reads = 0
     
     start_time = time.time()
 
-    # open log file to document script process. 'w' = write
+    # open log file to document script process --> 'w' = write
     with open(log_path, 'w') as log:
 
         log_print(f"Starting repetitive pattern detection for {input_file}", log)
@@ -92,7 +75,7 @@ def process_sequences(input_file, output_ids_path, output_tsv_path, log_path):
         log_print("Reading input FASTA / FASTQ file...", log)
         # open input file, 'rt' = read & write
         with open_func(input_file)(input_file, "rt") as handle:
-            # handle FASTA/FAST file
+            # handle FASTA/FASTQ file
             for record in SeqIO.parse(handle, seq_format):
                 total_reads += 1
                 read_id = record.id
@@ -126,14 +109,13 @@ def process_sequences(input_file, output_ids_path, output_tsv_path, log_path):
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description="Detect repetitive patterns (>10 nt) in a FASTA/FASTQ file.")
-    # required user input
     parser.add_argument("input_file", help="Input FASTA / FASTA.gz / FASTQ / FASTQ.gz file")
     args = parser.parse_args()
 
     # input file basename
     basename_file = os.path.basename(args.input_file)
 
-    # Automatically name the log file with timestamp
+    # automatically name the log file with timestamp
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = f"{basename_file}_log_repetitive_pattern_detection_{timestamp}.txt"
 
