@@ -91,7 +91,7 @@ def process_fasta(input_fasta, output_ids_path, output_tsv_path, log_path):
 
 def main():
     parser = argparse.ArgumentParser(description="Detect polyA start/middle/end patterns in a FASTA file.")
-    parser.add_argument("input_fasta_OR_fastq", help="Input FASTA / FASTA.gz / FASTQ / FASTQ.gz file")
+    parser.add_argument("input_fasta", help="Input FASTA / FASTA.gz / FASTQ / FASTQ.gz file")
     parser.add_argument("output_ids", help="Output TXT file with read IDs containing polyA patterns")
     parser.add_argument("output_tsv", help="Output TSV file with pattern info per read")
     args = parser.parse_args()
